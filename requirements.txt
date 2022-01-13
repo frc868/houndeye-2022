@@ -1,0 +1,3 @@
+pynetworktables
+opencv-python
+openni
