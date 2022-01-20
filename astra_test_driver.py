@@ -12,9 +12,6 @@ from openni import _openni2 as c_api
 logger = logging.getLogger(__name__)
 
 
-sd = NetworkTables.getTable("SmartDashboard")
-
-
 class Driver:
     in_hopper: list
     switch_flag: bool
@@ -38,7 +35,8 @@ class Driver:
         )
         self.color_stream.start()
 
-        # NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
+        NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
+        self.sd = NetworkTables.getTable("SmartDashboard")
 
     def shooter(self):
         self.shoot_flag = True
@@ -72,15 +70,14 @@ class Driver:
                 self.in_hopper.pop(0)
             self.shoot_flag = False
 
-    def get_color_frame(self):
-        frame = self.color_stream.read_frame()
-        frame_data = frame.get_buffer_as_uint8()
-        img = np.frombuffer(frame_data, dtype=np.uint8)
-        img.shape = (480, 640, 3)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.flip(img, 1)
+    def get_color_frame(self) -> np.ndarray:
+        raw_frame = self.color_stream.read_frame()
+        frame = np.frombuffer(raw_frame.get_buffer_as_uint8(), dtype=np.uint8)
+        frame.shape = (480, 640, 3)
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.flip(frame, 1)
 
-        return img
+        return frame
 
     def run(self, view: bool = False):
         start_time = time.time()
@@ -92,6 +89,7 @@ class Driver:
             frame
         )  # TODO: change this to work on red and blue mask
         self.switch_checks(frame)
+        self.sd.putBoolean("start_motor", "Found" in self.in_hopper)
 
         if view:
             v = frc_vision.hopper.viewer.Viewer()
