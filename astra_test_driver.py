@@ -74,7 +74,7 @@ class Driver:
         raw_frame = self.color_stream.read_frame()
         frame = np.frombuffer(raw_frame.get_buffer_as_uint8(), dtype=np.uint8)
         frame.shape = (480, 640, 3)
-        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.flip(frame, 1)
 
         return frame
