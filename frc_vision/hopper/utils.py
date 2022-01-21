@@ -48,8 +48,7 @@ def find_circles(frame):
     masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
     gray = cv2.cvtColor(masked_frame, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (7, 7), sigmaX=1.5, sigmaY=1.5)
-
+    blurred = cv2.medianBlur(gray, 51)
     circles = cv2.HoughCircles(
         blurred,
         cv2.HOUGH_GRADIENT,
