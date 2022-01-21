@@ -33,6 +33,8 @@ class HSV_BOUNDS:
 class ASTRA_CAMERA:
     RESOLUTION_W = 640
     RESOLUTION_H = 480
+    FOV_H = 60
+    FOV_V = 49.5
 
 
 TEST_BOUND_L = np.array([9, 141, 0])

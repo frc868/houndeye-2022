@@ -35,6 +35,19 @@ class Driver:
         )
         self.color_stream.start()
 
+        self.depth_stream = dev.create_depth_stream()
+        self.depth_stream.set_video_mode(
+            c_api.OniVideoMode(
+                pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_100_UM,
+                resolutionX=640,
+                resolutionY=480,
+                fps=30,
+            )
+        )
+        self.depth_stream.start()
+        dev.set_image_registration_mode(openni2.IMAGE_REGISTRATION_DEPTH_TO_COLOR)
+        dev.set_depth_color_sync_enabled(True)
+
         NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
         # self.sd = NetworkTables.getTable("SmartDashboard")
 
@@ -78,10 +91,23 @@ class Driver:
         frame = cv2.flip(frame, 1)
 
         return frame
+    
+    def get_depth_frame(self):
+        frame = self.depth_stream.read_frame()
+        frame_data = frame.get_buffer_as_uint16()
+        img = np.frombuffer(frame_data, dtype=np.uint16)
+        img.shape = (self.height, self.width)
+        img = cv2.medianBlur(img, 3)
+        img = cv2.flip(img, 1)
+
+        # self.depth_frame = img.copy()
+
+        return img
 
     def run(self, view: bool = False):
         start_time = time.time()
         frame = self.get_color_frame()
+        dframe = self.get_depth_frame()
         # cv2.imshow("test", frame)
         # self.red_mask, self.blue_mask = frc_vision.hopper.utils.generate_mask(frame)
 
@@ -90,11 +116,14 @@ class Driver:
         )  # TODO: change this to work on red and blue mask
         self.switch_checks(frame)
         # self.sd.putBoolean("start_motor", "Found" in self.in_hopper)
-        self.sd.putNumber("tx", 0)
-        test_circles = np.uint16(np.around(self.circles))
+        # self.sd.putNumber("tx", 0)
+        if self.circles is not None:
+            test_circles = np.uint16(np.around(self.circles))
 
-        for (x, y, r) in test_circles[0, :]:
-            print(x, y, r)
+            x,y,r = test_circles[0, :][0]
+            tx = frc_vision.constants.ASTRA_CAMERA.FOV_H/2 * (x-(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_W/2))/(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_W/2)
+            ty = frc_vision.constants.ASTRA_CAMERA.FOV_V/2 * (y-(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_H/2))/(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_H/2)
+            print(f"tx: {tx}, ty: {ty}")
         # print(self.circles[0])
 
         if view:
