@@ -36,7 +36,7 @@ class Driver:
         self.color_stream.start()
 
         NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
-        self.sd = NetworkTables.getTable("SmartDashboard")
+        # self.sd = NetworkTables.getTable("SmartDashboard")
 
     def shooter(self):
         self.shoot_flag = True
@@ -89,7 +89,13 @@ class Driver:
             frame
         )  # TODO: change this to work on red and blue mask
         self.switch_checks(frame)
-        self.sd.putBoolean("start_motor", "Found" in self.in_hopper)
+        # self.sd.putBoolean("start_motor", "Found" in self.in_hopper)
+        self.sd.putNumber("tx", 0)
+        test_circles = np.uint16(np.around(self.circles))
+
+        for (x, y, r) in test_circles[0, :]:
+            print(x, y, r)
+        # print(self.circles[0])
 
         if view:
             v = frc_vision.hopper.viewer.Viewer()
