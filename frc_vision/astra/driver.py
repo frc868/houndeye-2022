@@ -155,10 +155,12 @@ class Driver:
             start_time = time.time()
             color_frame, depth_frame = self.get_frames()
             blue_circles, red_circles = self.process_frame(color_frame, depth_frame)
-            self.write_to_networktables(blue_circles)
+            self.write_to_networktables(
+                blue_circles
+            )  # TODO: find a NetworkTables implementation that allows for data for multiple gamepieces to be sent
 
             if view:
-                v = frc_vision.viewer.Viewer(
+                frc_vision.viewer.view(
                     (
                         frc_vision.viewer.ViewerFrame(
                             color_frame, "color", show_data=True
@@ -166,10 +168,9 @@ class Driver:
                         frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
                     ),
                     (blue_circles, red_circles),
+                    [],
                     start_time,
-                    self.in_hopper,
                 )
-                v.view()
 
             if cv2.waitKey(15) == frc_vision.constants.CV2_WAIT_KEY:
                 running = False
