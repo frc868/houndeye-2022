@@ -1,7 +1,8 @@
 import tkinter as tk
 
-import frc_vision.webcam.driver
 import cv2
+
+import frc_vision.webcam.driver
 
 switch_flag = False
 shoot_flag = False

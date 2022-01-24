@@ -1,13 +1,15 @@
-from networktables import NetworkTables
+import logging
+import time
+
 import cv2
+import numpy as np
+from networktables import NetworkTables
+from openni import _openni2 as c_api
+from openni import openni2
+
 import frc_vision.constants
 import frc_vision.webcam.utils
-import logging
-import numpy as np
-import time
 import frc_vision.webcam.viewer
-from openni import openni2
-from openni import _openni2 as c_api
 
 logger = logging.getLogger(__name__)
 

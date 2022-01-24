@@ -86,8 +86,9 @@ maxRadiusS.set(maxRadius)
 
 
 import cv2
-import frc_vision.constants
 import numpy as np
+
+import frc_vision.constants
 
 
 def update(name, value):

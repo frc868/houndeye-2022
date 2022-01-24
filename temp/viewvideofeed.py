@@ -1,5 +1,6 @@
-import cv2
 import time
+
+import cv2
 
 capture = cv2.VideoCapture("lib/testing_video/blue1.avi")
 

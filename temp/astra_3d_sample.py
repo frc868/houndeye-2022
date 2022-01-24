@@ -1,5 +1,8 @@
+import time
+
+import cv2
+
 import frc_vision.astra.utils as au
-import cv2, time
 
 """
 initialization has the following options:

@@ -1,4 +1,5 @@
 import enum
+
 import numpy as np
 
 ROBORIO_SERVER = "roborio-868-frc.local"

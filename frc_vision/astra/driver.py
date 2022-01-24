@@ -1,17 +1,19 @@
-from openni import openni2
-from openni import _openni2 as c_api
-import cv2
-import numpy as np
 import logging
-import frc_vision.constants
-from frc_vision.utils import cv2Frame
-import frc_vision.astra.utils
-import frc_vision.viewer
-import frc_vision.utils
-import typing
 import time
+import typing
+
+import cv2
 import networktables
+import numpy as np
 from networktables import NetworkTables
+from openni import _openni2 as c_api
+from openni import openni2
+
+import frc_vision.astra.utils
+import frc_vision.constants
+import frc_vision.utils
+import frc_vision.viewer
+from frc_vision.utils import cv2Frame
 
 logger = logging.getLogger(__name__)  # TODO: Write logs to file.
 

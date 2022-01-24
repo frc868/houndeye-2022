@@ -1,12 +1,14 @@
-from networktables import NetworkTables
-import networktables
-import cv2
-import frc_vision.constants
-import frc_vision.webcam.utils
-import frc_vision.utils
 import logging
 import time
+
+import cv2
+import networktables
+from networktables import NetworkTables
+
+import frc_vision.constants
+import frc_vision.utils
 import frc_vision.viewer
+import frc_vision.webcam.utils
 
 logger = logging.getLogger(__name__)
 

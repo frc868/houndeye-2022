@@ -1,7 +1,8 @@
 import cv2
+import numpy as np
+
 import frc_vision.constants
 import frc_vision.utils
-import numpy as np
 
 
 def generate_masks(

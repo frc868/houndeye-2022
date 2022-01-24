@@ -1,7 +1,7 @@
 import cv2
-from openni import openni2
-from openni import _openni2 as c_api
 import numpy as np
+from openni import _openni2 as c_api
+from openni import openni2
 
 openni2.initialize()
 dev = openni2.Device.open_any()

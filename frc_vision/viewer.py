@@ -1,9 +1,11 @@
-import typing
-import cv2
-import frc_vision.webcam.utils
-import numpy as np
 import time
+import typing
+
+import cv2
+import numpy as np
+
 import frc_vision.utils
+import frc_vision.webcam.utils
 
 
 class ViewerFrame:

@@ -1,6 +1,7 @@
 import cv2
-import frc_vision.constants
 import numpy as np
+
+import frc_vision.constants
 
 
 class cv2Frame(np.ndarray):

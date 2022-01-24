@@ -1,7 +1,9 @@
-from openni import openni2
-from openni import _openni2 as c_api
-import sys, cv2
+import sys
+
+import cv2
 import numpy as np
+from openni import _openni2 as c_api
+from openni import openni2
 
 
 class Viewer3D:

@@ -1,11 +1,12 @@
 import threading
-import cv2
-import numpy as np
-import tkinter as tk
-import networktables
 import time
-import frc_vision.constants
+import tkinter as tk
 
+import cv2
+import networktables
+import numpy as np
+
+import frc_vision.constants
 
 vcap = cv2.VideoCapture(frc_vision.constants.VIEWER_ID)
 if not vcap.isOpened():
