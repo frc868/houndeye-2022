@@ -13,8 +13,7 @@ USE_RECORDING = False  # Set CAMERA to None when using this option
 
 
 # ----CALIBRATION----
-MASK_CALIBRATE = False
-HOUGH_CALIBRATE = False
+ENABLE_CALIBRATION = True
 
 # ----NETWORKTABLES----
 ENABLE_NETWORKTABLES = False
