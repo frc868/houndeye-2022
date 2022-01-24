@@ -61,13 +61,14 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     // System.out.println("Auto selected: " + m_autoSelected);
-    motor = new CANSparkMax(6, MotorType.kBrushless);
+    motor = new CANSparkMax(1, MotorType.kBrushless);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     boolean start_motor = SmartDashboard.getBoolean("start_motor", false);
+    // start_motor = true;
     if (start_motor) {
       motor.set(0.5);
     } else {
