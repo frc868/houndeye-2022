@@ -28,3 +28,5 @@ Do not commit changes to the `constants.py` file. These values have been calibra
 ### Code Quality and Standards
 
 Refer to the TechHOUNDS coding style guide. Although this is for Java, there is still valuable information for other languages. If your question is not answered by that, use the Google style guide for Python. Documentation is expected for all modules, classes, and functions, and all functions should be type-hinted. For all difficult to understand code, either simplify it or add comments.
+
+Note: for consistency's sake, whenever using both blue and red detection in the same function the order for params and return vars should be `blue, red`.
