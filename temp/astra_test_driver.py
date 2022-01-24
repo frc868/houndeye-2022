@@ -1,11 +1,11 @@
 from networktables import NetworkTables
 import cv2
 import frc_vision.constants
-import frc_vision.hopper.utils
+import frc_vision.webcam.utils
 import logging
 import numpy as np
 import time
-import frc_vision.hopper.viewer
+import frc_vision.webcam.viewer
 from openni import openni2
 from openni import _openni2 as c_api
 
@@ -72,7 +72,7 @@ class Driver:
 
     def switch_checks(self, frame):  # testing with ping pong ball
         if self.switch_flag:
-            if frc_vision.hopper.utils.find_circles(frame) is not None:
+            if frc_vision.webcam.utils.find_circles(frame) is not None:
                 self.in_hopper.append("Found")
             else:
                 self.in_hopper.append("No")
@@ -91,7 +91,7 @@ class Driver:
         frame = cv2.flip(frame, 1)
 
         return frame
-    
+
     def get_depth_frame(self):
         frame = self.depth_stream.read_frame()
         frame_data = frame.get_buffer_as_uint16()
@@ -111,7 +111,7 @@ class Driver:
         # cv2.imshow("test", frame)
         # self.red_mask, self.blue_mask = frc_vision.hopper.utils.generate_mask(frame)
 
-        self.circles = frc_vision.hopper.utils.find_circles(
+        self.circles = frc_vision.webcam.utils.find_circles(
             frame
         )  # TODO: change this to work on red and blue mask
         self.switch_checks(frame)
@@ -120,12 +120,19 @@ class Driver:
         if self.circles is not None:
             test_circles = np.uint16(np.around(self.circles))
 
-            x,y,r = test_circles[0, :][0]
-            tx = frc_vision.constants.ASTRA_CAMERA.FOV_H/2 * (x-(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_W/2))/(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_W/2)
-            ty = frc_vision.constants.ASTRA_CAMERA.FOV_V/2 * (y-(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_H/2))/(frc_vision.constants.ASTRA_CAMERA.RESOLUTION_H/2)
+            x, y, r = test_circles[0, :][0]
+            tx = (
+                (frc_vision.constants.ASTRA.FOV_H / 2)
+                * (x - (frc_vision.constants.ASTRA.RESOLUTION_W / 2))
+                / (frc_vision.constants.ASTRA.RESOLUTION_W / 2)
+            )
+            ty = (
+                (frc_vision.constants.ASTRA.FOV_V / 2)
+                * (y - (frc_vision.constants.ASTRA.RESOLUTION_H / 2))
+                / (frc_vision.constants.ASTRA.RESOLUTION_H / 2)
+            )
             print(f"tx: {tx}, ty: {ty}")
-        # print(self.circles[0])
 
         if view:
-            v = frc_vision.hopper.viewer.Viewer()
+            v = frc_vision.webcam.viewer.Viewer()
             v.view(frame, self.circles, start_time, self.in_hopper)

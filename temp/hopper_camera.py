@@ -1,6 +1,6 @@
 import tkinter as tk
 
-import frc_vision.hopper.driver
+import frc_vision.webcam.driver
 import cv2
 
 switch_flag = False
@@ -24,7 +24,7 @@ b.pack()
 b2 = tk.Button(root, text="Shoot Ball", command=shootCallBack)
 b2.pack()
 
-d = frc_vision.hopper.driver.Driver()
+d = frc_vision.webcam.driver.Driver()
 
 while True:
     d.run(view=True)
