@@ -15,7 +15,7 @@ import frc_vision.config
 import frc_vision.constants
 import frc_vision.utils
 import frc_vision.viewer
-from frc_vision.utils import cv2Frame
+from frc_vision.utils import circles, cv2Frame
 
 logger = logging.getLogger(__name__)  # TODO: Write logs to file.
 
@@ -126,7 +126,7 @@ class Driver:
 
         return color_frame, depth_frame
 
-    def destroy(self):
+    def destroy(self) -> None:
         """Cleans up streams and unloads camera."""
         self.depth_stream.stop()
         self.color_stream.stop()
@@ -134,13 +134,17 @@ class Driver:
         openni2.unload()
         cv2.destroyAllWindows()
 
-    def write_to_networktables(self, circles):
+    def write_to_networktables(
+        self, color: list[str], tx: list[float], ty: list[float]
+    ) -> None:
         """Writes circle location data to NetworkTables."""
-        tx, ty = frc_vision.astra.utils.calculate_angles(circles)
-        self.table.putNumber("tx", tx)
-        self.table.putNumber("ty", ty)
+        self.table.putStringArray("color", color)
+        self.table.putNumberArray("tx", tx)
+        self.table.putNumberArray("ty", ty)
 
-    def process_frame(self, color_frame, depth_frame):
+    def process_frame(
+        self, color_frame: cv2Frame, depth_frame: cv2Frame
+    ) -> tuple[circles, circles]:
         """
         Run all processing on the frames and return
         the end result. (Not decided yet)
@@ -150,6 +154,22 @@ class Driver:
         blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
         blue_circles = frc_vision.utils.find_circles(color_frame, blue_mask)
         red_circles = frc_vision.utils.find_circles(color_frame, red_mask)
+
+        txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
+        txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
+        color = []
+        tx = []
+        ty = []
+        for idx in range(len(txb)):
+            color += ["B"]
+            tx += [txb[idx]]
+            ty += [tyb[idx]]
+        for idx in range(len(txr)):
+            color += ["R"]
+            tx += [txr[idx]]
+            ty += [tyr[idx]]
+        self.write_to_networktables(color, tx, ty)
+
         return blue_circles, red_circles
 
     def run(self, view: bool = False) -> None:
@@ -162,9 +182,6 @@ class Driver:
             start_time = time.time()
             color_frame, depth_frame = self.get_frames()
             blue_circles, red_circles = self.process_frame(color_frame, depth_frame)
-            self.write_to_networktables(
-                blue_circles
-            )  # TODO: find a NetworkTables implementation that allows for data for multiple gamepieces to be sent
 
             if view:
                 frc_vision.viewer.view(
