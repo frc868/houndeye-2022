@@ -8,6 +8,8 @@ import frc_vision.utils
 def generate_masks(
     frame: frc_vision.utils.cv2Frame,
 ) -> tuple[frc_vision.utils.cv2Frame, frc_vision.utils.cv2Frame]:
+
+    frame = cv2.GaussianBlur(frame, (7, 7), sigmaX=1.5, sigmaY=1.5)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     blue_mask = cv2.inRange(

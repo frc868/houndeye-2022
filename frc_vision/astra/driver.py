@@ -10,6 +10,7 @@ from openni import _openni2 as c_api
 from openni import openni2
 
 import frc_vision.astra.utils
+import frc_vision.calibration
 import frc_vision.config
 import frc_vision.constants
 import frc_vision.utils
@@ -154,7 +155,7 @@ class Driver:
     def run(self, view: bool = False) -> None:
         """Main driver to run the detection program."""
         if frc_vision.config.ENABLE_CALIBRATION:
-            self.initalize_calibrators()
+            frc_vision.calibration.initalize_calibrators()
 
         running = True
         while running:
