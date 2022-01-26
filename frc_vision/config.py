@@ -9,7 +9,8 @@ class CameraTypes:
 
 
 CAMERA = CameraTypes.ASTRA
-USE_RECORDING = False  # Set CAMERA to None when using this option
+USE_RECORDING = True  # Set CAMERA to None when using this option
+RECORDING_FILENAME = "lib/testing_video/blue1.avi"
 
 
 # ----CALIBRATION----
