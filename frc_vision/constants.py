@@ -6,7 +6,25 @@ CV2_WAIT_KEY = 27  # esc key
 
 class HSV_BOUNDS:
     class ASTRA:
-        pass
+        BLUE_BOUND_L = np.array(
+            [98, 116, 59]
+        )  # lower bound for blue ball, in format [H, S, V]
+        BLUE_BOUND_U = np.array(
+            [121, 223, 255]
+        )  # upper bound for blue ball, in format [H, S, V]
+
+        RED_BOUND_L = np.array(
+            [172, 78, 65]
+        )  # lower bound for the first red ball mask, in format [H, S, V]
+        RED_BOUND_U = np.array(
+            [179, 214, 255]
+        )  # upper bound for first red ball mask, in format [H, S, V]
+        RED_BOUND_L2 = np.array(
+            [0, RED_BOUND_L[1], RED_BOUND_L[2]]
+        )  # lower bound for second red ball mask, in format [H, S, V]
+        RED_BOUND_U2 = np.array(
+            [9, RED_BOUND_U[1], RED_BOUND_U[2]]
+        )  # upper bound for second red ball mask, in format [H, S, V]
 
     class WEBCAM:
         BLUE_BOUND_L = np.array(
@@ -53,6 +71,8 @@ class HOUGH_CONSTANTS:
     MIN_RADIUS = 0  # Minimum radius of detected circle. TODO: Calibrate to gamepiece.
     MAX_RADIUS = 0  # Maximum radius of detected circle. TODO: Calibrate to gamepiece.
 
+
+CIRCLE_COMPARISON_THRESHOLD = 1.8
 
 VIEWER_ID = (
     0  # TODO: Test on driver station computer. This can also be set to a video file!
