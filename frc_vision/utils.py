@@ -1,13 +1,12 @@
+import typing
+
 import cv2
 import numpy as np
 
 import frc_vision.constants
 
-
-class cv2Frame(np.ndarray):
-    """Wrapper class designed exclusively for type-hinting."""
-
-    pass
+cv2Frame = typing.TypeVar("cv2Frame")
+circles = typing.TypeVar("circles")
 
 
 def find_circles(mask):
@@ -31,8 +30,8 @@ def find_circles(mask):
         ((x, y), r) = cv2.minEnclosingCircle(c)
 
         circle_area = 3.14 * r ** 2
-
         contour_area = cv2.contourArea(c)
+
         circle_validators = [
             r > 10,
             (
@@ -40,7 +39,7 @@ def find_circles(mask):
                 < frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD
             )
             if contour_area != 0
-            else 0,
+            else False,
         ]
 
         if all(circle_validators):

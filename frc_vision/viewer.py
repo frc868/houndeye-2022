@@ -38,8 +38,8 @@ def draw_circles(
 
     Params:
         frame: the frame to draw circles on
-        blue_circles: blue circles generated from HoughCircles
-        red_circles: red circles generated from HoughCircles
+        blue_circles: blue circles generated from `find_circles`
+        red_circles: red circles generated from `find_circles`
 
     Returns:
         frame: the frame with circles drawn on it
@@ -51,14 +51,14 @@ def draw_circles(
         # blue_circles = np.uint16(np.around(blue_circles))
 
         for (x, y, r) in blue_circles:
-            cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
+            cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
     if red_circles is not None:
         # red_circles = np.uint16(np.around(red_circles))
 
         for (x, y, r) in red_circles:
-            cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
+            cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
     return frame

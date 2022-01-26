@@ -68,6 +68,21 @@ class Driver:
         blue_circles = frc_vision.utils.find_circles(blue_mask)
         red_circles = frc_vision.utils.find_circles(red_mask)
         self.switch_checks(blue_circles, red_circles)
+
+        txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
+        txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
+        color = []
+        tx = []
+        ty = []
+        for idx in range(len(txb)):
+            color += ["B"]
+            tx += [txb[idx]]
+            ty += [tyb[idx]]
+        for idx in range(len(txr)):
+            color += ["R"]
+            tx += [txr[idx]]
+            ty += [tyr[idx]]
+        print(color, tx, ty)
         return blue_circles, red_circles
 
     def destroy(self):
@@ -109,10 +124,8 @@ class Driver:
             if frc_vision.config.ENABLE_CALIBRATION:
                 frc_vision.calibration.update_calibrators()
 
-            k = cv2.waitKey(40)
-            if (
-                k == frc_vision.constants.CV2_WAIT_KEY
-            ):  # Changed for recording to slow down playback
+            k = cv2.waitKey(40)  # Changed for recording to slow down playback
+            if k == frc_vision.constants.CV2_WAIT_KEY:
                 running = False
             elif k == 32:
                 playing = not playing

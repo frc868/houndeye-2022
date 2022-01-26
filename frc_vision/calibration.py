@@ -84,7 +84,7 @@ def calibrators(key: str, value: str):
         case "HLR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[0] = int(value)
         case "HUR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[0] = int(value)
 
-        case "Circle": frc_vision.constants.HOUGH_CONSTANTS.DP = int(value)/100
+        case "Circle": frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
 
 def update_calibrators():
     root.update()

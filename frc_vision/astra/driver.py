@@ -168,6 +168,7 @@ class Driver:
             color += ["R"]
             tx += [txr[idx]]
             ty += [tyr[idx]]
+        print(color, tx, ty)
         self.write_to_networktables(color, tx, ty)
 
         return blue_circles, red_circles

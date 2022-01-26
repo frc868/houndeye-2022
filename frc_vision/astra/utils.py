@@ -33,17 +33,18 @@ def generate_masks(
 
 
 def calculate_angles(circles):
-    circles = np.uint16(np.around(circles))
-
-    for x, y, r in circles[0, :]:
-        tx = (
+    """Calculates x and y deviation from center of camera feed."""
+    tx = []
+    ty = []
+    for x, y, r in circles:
+        tx += [
             (frc_vision.constants.ASTRA.FOV_H / 2)
             * (x - (frc_vision.constants.ASTRA.RESOLUTION_W / 2))
             / (frc_vision.constants.ASTRA.RESOLUTION_W / 2)
-        )
-        ty = (
+        ]
+        ty += [
             (frc_vision.constants.ASTRA.FOV_V / 2)
             * (y - (frc_vision.constants.ASTRA.RESOLUTION_H / 2))
             / (frc_vision.constants.ASTRA.RESOLUTION_H / 2)
-        )
+        ]
     return tx, ty
