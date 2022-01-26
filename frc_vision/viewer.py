@@ -48,24 +48,24 @@ def draw_circles(
         None
     """
     if blue_circles is not None:
-        blue_circles = np.uint16(np.around(blue_circles))
+        # blue_circles = np.uint16(np.around(blue_circles))
 
-        for (x, y, r) in blue_circles[0, :]:
-            cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
+        for (x, y, r) in blue_circles:
+            cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
     if red_circles is not None:
-        red_circles = np.uint16(np.around(red_circles))
+        # red_circles = np.uint16(np.around(red_circles))
 
-        for (x, y, r) in red_circles[0, :]:
-            cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
+        for (x, y, r) in red_circles:
+            cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
     return frame
 
 
 def draw_metrics(
-    self, frame, start_time: float, data: tuple[ViewerData] = []
+    frame, start_time: float, data: tuple[ViewerData] = []
 ) -> frc_vision.utils.cv2Frame:
     """Draws metrics to the frame. Also draws FPS."""
     cv2.putText(
@@ -92,7 +92,6 @@ def draw_metrics(
 
 
 def view(
-    self,
     frames: tuple[ViewerFrame],
     circles: tuple[np.ndarray],
     data: tuple[ViewerData],
@@ -102,8 +101,8 @@ def view(
     Displays all given frames, and overlays data on those frames if requested.
     """
     for vframe in frames:
-        frame = frame.frame
+        frame = vframe.frame
         if vframe.show_data:
-            frame = self.draw_circles(frame, circles[0], circles[1])
-            frame = self.draw_metrics(frame, start_time, data)
+            frame = draw_circles(frame, circles[0], circles[1])
+            frame = draw_metrics(frame, start_time, data)
         cv2.imshow(vframe.name, frame)
