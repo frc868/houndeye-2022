@@ -64,7 +64,7 @@ class Driver:
         blue_mask, red_mask = frc_vision.webcam.utils.generate_masks(frame)
         blue_circles = frc_vision.utils.find_circles(frame, blue_mask)
         red_circles = frc_vision.utils.find_circles(frame, red_mask)
-        self.switch_checks(frame, blue_circles, red_circles)
+        self.switch_checks(blue_circles, red_circles)
         return blue_circles, red_circles
 
     def destroy(self):
