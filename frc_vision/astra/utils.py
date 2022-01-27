@@ -63,7 +63,23 @@ def calculate_distance(circles: circles, depth_frame: cv2Frame) -> list[float]:
         y2 = min(frc_vision.constants.ASTRA.RESOLUTION_H - 1, y + roi_margin)
         roi = depth_frame[y1:y2, x1:x2]
 
-        ta += int(np.average(roi))
+        ta += [int(np.average(roi))]
+    return ta
+
+def calculate_distance(circles: circles, depth_frame: cv2Frame) -> list[float]:
+    ta = []
+    for x, y, r in circles:
+        roi_margin = int(
+            r * 0.20
+        )  # can be adjusted to reflect the portion of the ball to test
+        x1 = max(0, x - roi_margin)
+        x2 = min(frc_vision.constants.ASTRA.RESOLUTION_W - 1, x + roi_margin)
+        y1 = max(0, y - roi_margin)
+        y2 = min(frc_vision.constants.ASTRA.RESOLUTION_H - 1, y + roi_margin)
+        roi = depth_frame[y1:y2, x1:x2]
+        print(roi)
+
+        ta += [int(np.average(roi))]
     return ta
 
 
@@ -73,4 +89,4 @@ def zip_networktables_data(txb, tyb, txr, tyr, tab, tar):
     tx = txb + txr
     ty = tyb + tyr
     ta = tab + tar
-    return zip(color, tx, ty, ta)
+    return color, tx, ty, ta

@@ -22,6 +22,7 @@ def initalize_calibrators():
     """
     Check if calibration is on, and if so, enable trackbars.
     """
+    print("help")
     global root
 
     root = tk.Tk()

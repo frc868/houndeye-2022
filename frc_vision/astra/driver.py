@@ -90,7 +90,7 @@ class Driver:
         self.table = NetworkTables.getTable("FRCVision")
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(("10.8.68.190", 9998))
+        self.sock.bind((frc_vision.constants.SERVER_IP, frc_vision.constants.SERVER_PORT))
         self.sock.listen(5)
 
     def get_frames(self) -> tuple[cv2Frame, cv2Frame]:
@@ -195,32 +195,44 @@ class Driver:
 
         running = True
         while running:
-            start_time = time.time()
-            color_frame, depth_frame = self.get_frames()
-            blue_circles, red_circles, data = self.process_frame(
-                color_frame, depth_frame
-            )
-
-            color, tx, ty, ta = data
-            if view:
-                frc_vision.viewer.view(
-                    (
-                        frc_vision.viewer.ViewerFrame(
-                            color_frame, "color", show_data=True
-                        ),
-                        frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
-                    ),
-                    (blue_circles, red_circles),
-                    [
-                        frc_vision.viewer.ViewerData("color", color),
-                        frc_vision.viewer.ViewerData("tx", tx),
-                        frc_vision.viewer.ViewerData("ty", ty),
-                        frc_vision.viewer.ViewerData("ta", ta),
-                    ],
-                    start_time,
+            try:
+                start_time = time.time()
+                color_frame, depth_frame = self.get_frames()
+                blue_circles, red_circles, data = self.process_frame(
+                    color_frame, depth_frame
                 )
 
-            if cv2.waitKey(15) == frc_vision.constants.CV2_WAIT_KEY:
+                color, tx, ty, ta = data
+                # self.send_data(color_frame, blue_circles, red_circles, start_time)
+                if view:
+                    blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
+
+                    frc_vision.viewer.view(
+                        (
+                            frc_vision.viewer.ViewerFrame(
+                                color_frame, "color", show_data=True
+                            ),
+                            frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
+                            frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
+                            frc_vision.viewer.ViewerFrame(red_mask, "red"),
+                        ),
+                        depth_frame,
+                        (blue_circles, red_circles),
+                        [
+                            # frc_vision.viewer.ViewerData("color", color),
+                            # frc_vision.viewer.ViewerData("tx", tx),
+                            # frc_vision.viewer.ViewerData("ty", ty),
+                            # frc_vision.viewer.ViewerData("ta", ta),
+                        ],
+                        start_time,
+                    )
+                
+                if frc_vision.config.ENABLE_CALIBRATION:
+                    frc_vision.calibration.update_calibrators()
+
+                if cv2.waitKey(15) == frc_vision.constants.CV2_WAIT_KEY:
+                    running = False
+            except KeyboardInterrupt:
                 running = False
 
         self.destroy()

@@ -2,7 +2,8 @@ import numpy as np
 
 ROBORIO_SERVER = "roborio-868-frc.local"
 CV2_WAIT_KEY = 27  # esc key
-
+SERVER_IP = "10.8.68.190"
+SERVER_PORT = 9999
 
 class HSV_BOUNDS:
     class ASTRA:
@@ -14,16 +15,16 @@ class HSV_BOUNDS:
         )  # upper bound for blue ball, in format [H, S, V]
 
         RED_BOUND_L = np.array(
-            [172, 78, 65]
+            [169, 83, 0]
         )  # lower bound for the first red ball mask, in format [H, S, V]
         RED_BOUND_U = np.array(
-            [179, 214, 255]
+            [179, 250, 255]
         )  # upper bound for first red ball mask, in format [H, S, V]
         RED_BOUND_L2 = np.array(
             [0, RED_BOUND_L[1], RED_BOUND_L[2]]
         )  # lower bound for second red ball mask, in format [H, S, V]
         RED_BOUND_U2 = np.array(
-            [9, RED_BOUND_U[1], RED_BOUND_U[2]]
+            [20, RED_BOUND_U[1], RED_BOUND_U[2]]
         )  # upper bound for second red ball mask, in format [H, S, V]
 
     class WEBCAM:

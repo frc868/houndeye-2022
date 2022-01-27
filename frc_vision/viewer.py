@@ -6,6 +6,7 @@ import numpy as np
 
 import frc_vision.utils
 import frc_vision.webcam.utils
+import frc_vision.astra.utils
 
 
 class ViewerFrame:
@@ -31,7 +32,7 @@ class ViewerData:
 
 
 def draw_circles(
-    frame: frc_vision.utils.cv2Frame, blue_circles, red_circles
+    frame: frc_vision.utils.cv2Frame, depth_frame, blue_circles, red_circles
 ) -> frc_vision.utils.cv2Frame:
     """
     Draw circles on a given frame.
@@ -47,17 +48,22 @@ def draw_circles(
     Raises:
         None
     """
-    if blue_circles is not None:
+    tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
+    tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
+
+    # print(tab), print(tar)
+    if blue_circles is not None and tab != []:
         # blue_circles = np.uint16(np.around(blue_circles))
 
-        for (x, y, r) in blue_circles:
+        for (x, y, r), a in (blue_circles, tab):
             cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
+            cv2.putText(frame, )
 
-    if red_circles is not None:
+    if red_circles is not None and tar != []:
         # red_circles = np.uint16(np.around(red_circles))
 
-        for (x, y, r) in red_circles:
+        for (x, y, r), a in (red_circles, tar):
             cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
@@ -93,6 +99,7 @@ def draw_metrics(
 
 def view(
     frames: tuple[ViewerFrame],
+    depth_frame,
     circles: tuple[np.ndarray],
     data: tuple[ViewerData],
     start_time: float,
@@ -103,6 +110,6 @@ def view(
     for vframe in frames:
         frame = vframe.frame
         if vframe.show_data:
-            frame = draw_circles(frame, circles[0], circles[1])
+            frame = draw_circles(frame, depth_frame, circles[0], circles[1])
             frame = draw_metrics(frame, start_time, data)
         cv2.imshow(vframe.name, frame)
