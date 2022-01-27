@@ -5,8 +5,8 @@ import numpy as np
 
 import frc_vision.constants
 
-cv2Frame = typing.TypeVar("cv2Frame")
-circles = typing.TypeVar("circles")
+cv2Frame = typing.NewType("cv2Frame", np.ndarray)
+circles = typing.NewType("circles", list[tuple[int]])
 
 
 def find_circles(mask):
@@ -43,6 +43,6 @@ def find_circles(mask):
         ]
 
         if all(circle_validators):
-            circles += [[int(x), int(y), int(r)]]
+            circles += [(int(x), int(y), int(r))]
 
     return circles
