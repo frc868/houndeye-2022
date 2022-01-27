@@ -134,17 +134,17 @@ class Driver:
         openni2.unload()
         cv2.destroyAllWindows()
 
-    def write_to_networktables(
-        self, color: list[str], tx: list[float], ty: list[float]
-    ) -> None:
+    def write_to_networktables(self, data) -> None:
         """Writes circle location data to NetworkTables."""
+        color, tx, ty, ta = data
         self.table.putStringArray("color", color)
         self.table.putNumberArray("tx", tx)
         self.table.putNumberArray("ty", ty)
+        self.table.putNumberArray("ta", ta)
 
     def process_frame(
         self, color_frame: cv2Frame, depth_frame: cv2Frame
-    ) -> tuple[circles, circles]:
+    ) -> tuple[circles, circles, tuple[float]]:
         """
         Run all processing on the frames and return
         the end result. (Not decided yet)
@@ -157,21 +157,15 @@ class Driver:
 
         txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
         txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
-        color = []
-        tx = []
-        ty = []
-        for idx in range(len(txb)):
-            color += ["B"]
-            tx += [txb[idx]]
-            ty += [tyb[idx]]
-        for idx in range(len(txr)):
-            color += ["R"]
-            tx += [txr[idx]]
-            ty += [tyr[idx]]
-        print(color, tx, ty)
-        self.write_to_networktables(color, tx, ty)
+        tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
+        tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
 
-        return blue_circles, red_circles
+        data = frc_vision.astra.utils.zip_networktables_data(
+            txb, tyb, txr, tyr, tab, tar
+        )
+        self.write_to_networktables(data)
+
+        return blue_circles, red_circles, data
 
     def run(self, view: bool = False) -> None:
         """Main driver to run the detection program."""
@@ -182,8 +176,11 @@ class Driver:
         while running:
             start_time = time.time()
             color_frame, depth_frame = self.get_frames()
-            blue_circles, red_circles = self.process_frame(color_frame, depth_frame)
+            blue_circles, red_circles, data = self.process_frame(
+                color_frame, depth_frame
+            )
 
+            color, tx, ty, ta = data
             if view:
                 frc_vision.viewer.view(
                     (
@@ -193,7 +190,12 @@ class Driver:
                         frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
                     ),
                     (blue_circles, red_circles),
-                    [],
+                    [
+                        frc_vision.viewer.ViewerData("color", color),
+                        frc_vision.viewer.ViewerData("tx", tx),
+                        frc_vision.viewer.ViewerData("ty", ty),
+                        frc_vision.viewer.ViewerData("ta", ta),
+                    ],
                     start_time,
                 )
 
