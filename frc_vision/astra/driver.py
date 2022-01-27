@@ -1,4 +1,7 @@
 import logging
+import pickle
+import socket
+import struct
 import time
 import typing
 
@@ -28,6 +31,7 @@ class Driver:
     color_stream: typing.Optional[openni2.VideoStream]
     depth_stream: typing.Optional[openni2.VideoStream]
     table: networktables.NetworkTable
+    client = None
 
     def __init__(self):
         self.create_streams()
@@ -84,6 +88,10 @@ class Driver:
 
         NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
         self.table = NetworkTables.getTable("FRCVision")
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind(("10.8.68.190", 9998))
+        self.sock.listen(5)
 
     def get_frames(self) -> tuple[cv2Frame, cv2Frame]:
         """
@@ -152,8 +160,8 @@ class Driver:
         TODO: add depth frame analysis.
         """
         blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
-        blue_circles = frc_vision.utils.find_circles(color_frame, blue_mask)
-        red_circles = frc_vision.utils.find_circles(color_frame, red_mask)
+        blue_circles = frc_vision.utils.find_circles(blue_mask)
+        red_circles = frc_vision.utils.find_circles(red_mask)
 
         txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
         txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
@@ -173,6 +181,19 @@ class Driver:
 
         return blue_circles, red_circles
 
+    def send_data(self, frame, blue_circles, red_circles, start_time):
+        frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
+        frame = frc_vision.viewer.draw_metrics(frame, start_time)
+        if not self.client:
+            self.client, addr = self.sock.accept()
+        if self.client:
+            frame = cv2.resize(frame, (320, 240))
+            a = pickle.dumps(frame)
+            message = struct.pack("Q", len(a)) + a
+            self.client.sendall(message)
+            cv2.imshow("transmit", frame)
+
+    
     def run(self, view: bool = False) -> None:
         """Main driver to run the detection program."""
         if frc_vision.config.ENABLE_CALIBRATION:
@@ -184,6 +205,7 @@ class Driver:
             color_frame, depth_frame = self.get_frames()
             blue_circles, red_circles = self.process_frame(color_frame, depth_frame)
 
+            self.send_data(color_frame, blue_circles, red_circles, start_time)
             if view:
                 frc_vision.viewer.view(
                     (

@@ -68,23 +68,22 @@ def calibrators(key: str, value: str):
     """
     Set constants to trackbar positions.
     """
-    match key:
-        case "HLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[0] = int(value)
-        case "SLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[1] = int(value)
-        case "VLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[2] = int(value)
-        case "HUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[0] = int(value)
-        case "SUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[1] = int(value)
-        case "VUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[2] = int(value)
-        case "HLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[0] = int(value)
-        case "SLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[1] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[1] = int(value)
-        case "VLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[2] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[2] = int(value)
-        case "HUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[0] = int(value)
-        case "SUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[1] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[1] = int(value)
-        case "VUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[2] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[2] = int(value)
-        case "HLR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[0] = int(value)
-        case "HUR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[0] = int(value)
+    if key == "HLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[0] = int(value)
+    if key == "SLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[1] = int(value)
+    if key == "VLB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L[2] = int(value)
+    if key == "HUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[0] = int(value)
+    if key == "SUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[1] = int(value)
+    if key == "VUB": frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U[2] = int(value)
+    if key == "HLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[0] = int(value)
+    if key == "SLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[1] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[1] = int(value)
+    if key == "VLR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L[2] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[2] = int(value)
+    if key == "HUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[0] = int(value)
+    if key == "SUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[1] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[1] = int(value)
+    if key == "VUR": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U[2] = frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[2] = int(value)
+    if key == "HLR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2[0] = int(value)
+    if key == "HUR2": frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2[0] = int(value)
 
-        case "Circle": frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
+    if key == "Circle": frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
 
 def update_calibrators():
     root.update()
