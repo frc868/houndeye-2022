@@ -167,13 +167,16 @@ class Driver:
 
         txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
         txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
-        tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
-        tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
+        tdb = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
+        tdr = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
 
         data = frc_vision.astra.utils.zip_networktables_data(
-            txb, tyb, txr, tyr, tab, tar
+            txb, tyb, txr, tyr, tdb, tdr
         )
         self.write_to_networktables(data)
+
+        blue_circles = ((x,y,r) + (d,) for (x,y,r),d in (blue_circles, tdb))
+        red_circles = ((x,y,r) + (d,) for (x,y,r),d in (red_circles, tdr))
 
         return blue_circles, red_circles, data
 
