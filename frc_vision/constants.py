@@ -5,6 +5,7 @@ CV2_WAIT_KEY = 27  # esc key
 SERVER_IP = "10.8.68.190"
 SERVER_PORT = 9999
 
+
 class HSV_BOUNDS:
     class ASTRA:
         BLUE_BOUND_L = np.array(
