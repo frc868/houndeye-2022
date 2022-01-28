@@ -90,7 +90,9 @@ class Driver:
         self.table = NetworkTables.getTable("FRCVision")
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((frc_vision.constants.SERVER_IP, frc_vision.constants.SERVER_PORT))
+        self.sock.bind(
+            (frc_vision.constants.SERVER_IP, frc_vision.constants.SERVER_PORT)
+        )
         self.sock.listen(5)
 
     def get_frames(self) -> tuple[cv2Frame, cv2Frame]:
@@ -187,7 +189,6 @@ class Driver:
             self.client.sendall(message)
             cv2.imshow("transmit", frame)
 
-    
     def run(self, view: bool = False) -> None:
         """Main driver to run the detection program."""
         if frc_vision.config.ENABLE_CALIBRATION:
@@ -205,10 +206,12 @@ class Driver:
                 color, tx, ty, ta = data
                 # self.send_data(color_frame, blue_circles, red_circles, start_time)
                 if view:
-                    blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
+                    blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
+                        color_frame
+                    )
 
                     frc_vision.viewer.view(
-                        (
+                        frames=(
                             frc_vision.viewer.ViewerFrame(
                                 color_frame, "color", show_data=True
                             ),
@@ -216,17 +219,17 @@ class Driver:
                             frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
                             frc_vision.viewer.ViewerFrame(red_mask, "red"),
                         ),
-                        depth_frame,
-                        (blue_circles, red_circles),
-                        [
-                            # frc_vision.viewer.ViewerData("color", color),
-                            # frc_vision.viewer.ViewerData("tx", tx),
-                            # frc_vision.viewer.ViewerData("ty", ty),
-                            # frc_vision.viewer.ViewerData("ta", ta),
+                        depth_frame=depth_frame,
+                        circles=(blue_circles, red_circles),
+                        data=[
+                            frc_vision.viewer.ViewerData("color", color),
+                            frc_vision.viewer.ViewerData("tx", tx),
+                            frc_vision.viewer.ViewerData("ty", ty),
+                            frc_vision.viewer.ViewerData("ta", ta),
                         ],
-                        start_time,
+                        start_time=start_time,
                     )
-                
+
                 if frc_vision.config.ENABLE_CALIBRATION:
                     frc_vision.calibration.update_calibrators()
 
