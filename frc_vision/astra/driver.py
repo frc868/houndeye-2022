@@ -203,7 +203,7 @@ class Driver:
                 )
 
                 color, tx, ty, ta = data
-                # self.send_data(color_frame, blue_circles, red_circles, start_time)
+                self.send_data(color_frame, blue_circles, red_circles, start_time)
                 if view:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
 
@@ -212,9 +212,9 @@ class Driver:
                             frc_vision.viewer.ViewerFrame(
                                 color_frame, "color", show_data=True
                             ),
-                            frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
-                            frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
-                            frc_vision.viewer.ViewerFrame(red_mask, "red"),
+                            # frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
+                            # frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
+                            # frc_vision.viewer.ViewerFrame(red_mask, "red"),
                         ),
                         depth_frame,
                         (blue_circles, red_circles),

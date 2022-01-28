@@ -32,7 +32,7 @@ class ViewerData:
 
 
 def draw_circles(
-    frame: frc_vision.utils.cv2Frame, depth_frame, blue_circles, red_circles
+    frame: frc_vision.utils.cv2Frame, blue_circles, red_circles
 ) -> frc_vision.utils.cv2Frame:
     """
     Draw circles on a given frame.
@@ -48,22 +48,22 @@ def draw_circles(
     Raises:
         None
     """
-    tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
-    tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
+    # tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
+    # tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
 
     # print(tab), print(tar)
-    if blue_circles is not None and tab != []:
+    if blue_circles is not None:
         # blue_circles = np.uint16(np.around(blue_circles))
 
-        for (x, y, r), a in (blue_circles, tab):
+        for (x, y, r) in blue_circles:
             cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
-            cv2.putText(frame, )
+            # cv2.putText(frame, )
 
-    if red_circles is not None and tar != []:
+    if red_circles is not None:
         # red_circles = np.uint16(np.around(red_circles))
 
-        for (x, y, r), a in (red_circles, tar):
+        for (x, y, r) in red_circles:
             cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
 
@@ -110,6 +110,6 @@ def view(
     for vframe in frames:
         frame = vframe.frame
         if vframe.show_data:
-            frame = draw_circles(frame, depth_frame, circles[0], circles[1])
+            frame = draw_circles(frame, circles[0], circles[1])
             frame = draw_metrics(frame, start_time, data)
         cv2.imshow(vframe.name, frame)
