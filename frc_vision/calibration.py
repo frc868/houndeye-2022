@@ -4,6 +4,13 @@ import cv2
 
 import frc_vision.constants
 
+"""
+Certain code is intentionally all on one line
+to make it easier to debug (ignoring style guide).
+Black formatter has not been applied to this file.
+"""
+
+# fmt: off
 
 def create_scale(from_, to, key, original_value):
     """Lessens code length in `initialize_calibrators`."""
