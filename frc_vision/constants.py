@@ -1,9 +1,19 @@
 import numpy as np
 
-ROBORIO_SERVER = "roborio-868-frc.local"
-CV2_WAIT_KEY = 27  # esc key
-SERVER_IP = "10.8.68.190"
-SERVER_PORT = 9999
+
+class KEYS:
+    CV2_WAIT_KEY = 27  # esc key
+    CLIENT_SWITCH_KEY = 120  # x key
+
+
+class SERVERS:
+    ROBORIO_SERVER_IP = "roborio-868-frc.local"
+
+    RASPI_SERVER_IP = "10.8.68.190"
+    RASPI_SERVER_PORT = 9999
+
+    LIMELIGHT_SERVER_IP = "10.8.68.47"
+    LIMELIGHT_SERVER_PORT = 5800
 
 
 class HSV_BOUNDS:
@@ -28,30 +38,6 @@ class HSV_BOUNDS:
             [20, RED_BOUND_U[1], RED_BOUND_U[2]]
         )  # upper bound for second red ball mask, in format [H, S, V]
 
-    class WEBCAM:
-        BLUE_BOUND_L = np.array(
-            [98, 112, 0]
-        )  # lower bound for blue ball, in format [H, S, V]
-        BLUE_BOUND_U = np.array(
-            [112, 241, 255]
-        )  # upper bound for blue ball, in format [H, S, V]
-
-        RED_BOUND_L = np.array(
-            [0, 149, 63]
-        )  # lower bound for the first red ball mask, in format [H, S, V]
-        RED_BOUND_U = np.array(
-            [10, 255, 255]
-        )  # upper bound for first red ball mask, in format [H, S, V]
-        RED_BOUND_L2 = np.array(
-            [171, 149, 63]
-        )  # lower bound for second red ball mask, in format [H, S, V]
-        RED_BOUND_U2 = np.array(
-            [179, 255, 255]
-        )  # upper bound for second red ball mask, in format [H, S, V]
-
-    TEST_BOUND_L = np.array([9, 141, 0])  # temp
-    TEST_BOUND_U = np.array([21, 248, 255])  # temp
-
 
 class ASTRA:
     RESOLUTION_W = 640
@@ -59,10 +45,6 @@ class ASTRA:
     FOV_H = 60
     FOV_V = 49.5
     FPS = 30
-
-
-TEST_BOUND_L = np.array([9, 141, 0])
-TEST_BOUND_U = np.array([21, 248, 255])
 
 
 class HOUGH_CONSTANTS:
@@ -75,7 +57,3 @@ class HOUGH_CONSTANTS:
 
 
 CIRCLE_COMPARISON_THRESHOLD = 1.8
-
-VIEWER_ID = (
-    0  # TODO: Test on driver station computer. This can also be set to a video file!
-)
