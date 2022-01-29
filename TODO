@@ -1,4 +1,1 @@
 - Add depth processing
-- Relay fully processed image to driver's station and display on secondary monitor
-- Recalibrate HSV bounds for Astra and webcam
-- Calibrate HoughCircles and test filtering
