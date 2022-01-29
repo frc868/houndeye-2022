@@ -14,7 +14,6 @@ from openni import openni2
 
 import frc_vision.astra.utils
 import frc_vision.calibration
-import frc_vision.config
 import frc_vision.constants
 import frc_vision.utils
 import frc_vision.viewer
@@ -35,6 +34,8 @@ class Driver:
 
     def __init__(self):
         self.create_streams()
+        self.initialize_networktables()
+        self.initialize_server()
 
     def create_streams(self) -> None:
         """
@@ -86,12 +87,23 @@ class Driver:
         device.set_image_registration_mode(openni2.IMAGE_REGISTRATION_DEPTH_TO_COLOR)
         device.set_depth_color_sync_enabled(True)
 
-        NetworkTables.initialize(server=frc_vision.constants.ROBORIO_SERVER)
+    def initialize_networktables(self):
+        """Connects to NetworkTables on the roboRIO."""
+        NetworkTables.initialize(server=frc_vision.constants.SERVERS.ROBORIO_SERVER_IP)
         self.table = NetworkTables.getTable("FRCVision")
 
+    def initialize_server(self):
+        """
+        Initializes server socket.
+        (Currently, this is blocking until a client connects)
+        TODO: add threading to prevent this
+        """
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind(
-            (frc_vision.constants.SERVER_IP, frc_vision.constants.SERVER_PORT)
+            (
+                frc_vision.constants.SERVERS.RASPI_SERVER_IP,
+                frc_vision.constants.SERVERS.RASPI_SERVER_PORT,
+            )
         )
         self.sock.listen(5)
 
@@ -145,12 +157,23 @@ class Driver:
         cv2.destroyAllWindows()
 
     def write_to_networktables(self, data) -> None:
-        """Writes circle location data to NetworkTables."""
-        color, tx, ty, ta = data
+        """
+        Writes circle location data to NetworkTables.
+
+        CURRENT DATA STRUCTURE:
+        Four arrays are output to NetworkTables, with
+        indices being constant across all arrays
+        (that is, ball 0 will be ball 0 in color, tx, ty, and td)
+        color: either "B" or "R", denotes ball color
+        tx: x degree offset from center (from -30 to 30)
+        ty: y degree offset from center (from -24.75 to 24.75)
+        td: distance from camera to ball
+        """
+        color, tx, ty, td = data
         self.table.putStringArray("color", color)
         self.table.putNumberArray("tx", tx)
         self.table.putNumberArray("ty", ty)
-        self.table.putNumberArray("ta", ta)
+        self.table.putNumberArray("td", td)
 
     def process_frame(
         self, color_frame: cv2Frame, depth_frame: cv2Frame
@@ -158,43 +181,40 @@ class Driver:
         """
         Run all processing on the frames and return
         the end result. (Not decided yet)
-
-        TODO: add depth frame analysis.
         """
         blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
-        blue_circles = frc_vision.utils.find_circles(blue_mask)
-        red_circles = frc_vision.utils.find_circles(red_mask)
+        blue_circles = frc_vision.astra.utils.find_circles(blue_mask, depth_frame)
+        red_circles = frc_vision.astra.utils.find_circles(red_mask, depth_frame)
 
         txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
         txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
-        tdb = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
-        tdr = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
+
+        tdb = [d for x, y, r, d in blue_circles]
+        tdr = [d for x, y, r, d in red_circles]
 
         data = frc_vision.astra.utils.zip_networktables_data(
             txb, tyb, txr, tyr, tdb, tdr
         )
         self.write_to_networktables(data)
 
-        blue_circles = ((x,y,r) + (d,) for (x,y,r),d in (blue_circles, tdb))
-        red_circles = ((x,y,r) + (d,) for (x,y,r),d in (red_circles, tdr))
-
         return blue_circles, red_circles, data
 
     def send_data(self, frame, blue_circles, red_circles, start_time):
+        """Sends frame data with annotations to the driver's station."""
         frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
         frame = frc_vision.viewer.draw_metrics(frame, start_time)
         if not self.client:
             self.client, addr = self.sock.accept()
         if self.client:
             frame = cv2.resize(frame, (320, 240))
-            a = pickle.dumps(frame)
-            message = struct.pack("Q", len(a)) + a
+            data = pickle.dumps(frame)
+            message = struct.pack("L", len(data)) + data
             self.client.sendall(message)
             cv2.imshow("transmit", frame)
 
-    def run(self, view: bool = False) -> None:
+    def run(self, enable_calibration: bool = False) -> None:
         """Main driver to run the detection program."""
-        if frc_vision.config.ENABLE_CALIBRATION:
+        if enable_calibration:
             frc_vision.calibration.initalize_calibrators()
 
         running = True
@@ -204,11 +224,12 @@ class Driver:
                 color_frame, depth_frame = self.get_frames()
                 blue_circles, red_circles, data = self.process_frame(
                     color_frame, depth_frame
-                )
+                )  # temp result for debug, will remove or move to calibration only for efficiency's sake
 
                 color, tx, ty, ta = data
+
                 self.send_data(color_frame, blue_circles, red_circles, start_time)
-                if view:
+                if enable_calibration:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
                         color_frame
                     )
@@ -218,9 +239,9 @@ class Driver:
                             frc_vision.viewer.ViewerFrame(
                                 color_frame, "color", show_data=True
                             ),
-                            # frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
-                            # frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
-                            # frc_vision.viewer.ViewerFrame(red_mask, "red"),
+                            frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
+                            frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
+                            frc_vision.viewer.ViewerFrame(red_mask, "red"),
                         ),
                         depth_frame=depth_frame,
                         circles=(blue_circles, red_circles),
@@ -233,10 +254,10 @@ class Driver:
                         start_time=start_time,
                     )
 
-                if frc_vision.config.ENABLE_CALIBRATION:
+                if enable_calibration:
                     frc_vision.calibration.update_calibrators()
 
-                if cv2.waitKey(15) == frc_vision.constants.CV2_WAIT_KEY:
+                if cv2.waitKey(15) == frc_vision.constants.KEYS.CV2_WAIT_KEY:
                     running = False
             except KeyboardInterrupt:
                 running = False
