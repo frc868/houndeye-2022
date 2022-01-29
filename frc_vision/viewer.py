@@ -4,9 +4,8 @@ import typing
 import cv2
 import numpy as np
 
-import frc_vision.utils
-import frc_vision.webcam.utils
 import frc_vision.astra.utils
+import frc_vision.utils
 
 
 class ViewerFrame:
@@ -35,7 +34,7 @@ def draw_circles(
     frame: frc_vision.utils.cv2Frame, blue_circles, red_circles
 ) -> frc_vision.utils.cv2Frame:
     """
-    Draw circles on a given frame.
+    Draw circles on a given frame, along with distance information
 
     Params:
         frame: the frame to draw circles on
@@ -48,24 +47,18 @@ def draw_circles(
     Raises:
         None
     """
-    # tab = frc_vision.astra.utils.calculate_distance(blue_circles, depth_frame)
-    # tar = frc_vision.astra.utils.calculate_distance(red_circles, depth_frame)
 
-    # print(tab), print(tar)
     if blue_circles is not None:
-        # blue_circles = np.uint16(np.around(blue_circles))
-
-        for (x, y, r) in blue_circles:
+        for (x, y, r, d) in blue_circles:
             cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
-            # cv2.putText(frame, )
+            cv2.putText(frame, d, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
 
     if red_circles is not None:
-        # red_circles = np.uint16(np.around(red_circles))
-
         for (x, y, r) in red_circles:
             cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
+            cv2.putText(frame, d, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 225))
 
     return frame
 
@@ -86,10 +79,7 @@ def draw_metrics(
         cv2.putText(
             frame,
             f"{d.name}: {d.value}",
-            (
-                20,
-                40,
-            ),  # TODO: Edit location on screen based on how many values are displayed (to prevent overflow)
+            (20, 40 + (20 * d)),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
             (0, 255, 0),
@@ -99,7 +89,6 @@ def draw_metrics(
 
 def view(
     frames: tuple[ViewerFrame],
-    depth_frame,
     circles: tuple[np.ndarray],
     data: tuple[ViewerData],
     start_time: float,

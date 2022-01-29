@@ -243,7 +243,6 @@ class Driver:
                             frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
                             frc_vision.viewer.ViewerFrame(red_mask, "red"),
                         ),
-                        depth_frame=depth_frame,
                         circles=(blue_circles, red_circles),
                         data=[
                             frc_vision.viewer.ViewerData("color", color),
