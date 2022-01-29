@@ -7,11 +7,9 @@ from networktables import NetworkTables
 
 import frc_vision.astra.utils
 import frc_vision.calibration
-import frc_vision.config
 import frc_vision.constants
 import frc_vision.utils
 import frc_vision.viewer
-import frc_vision.webcam.utils
 
 logger = logging.getLogger(__name__)
 
