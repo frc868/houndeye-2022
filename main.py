@@ -1,7 +1,10 @@
 import frc_vision.astra.driver
-# import frc_vision.recording
-import frc_vision.webcam.driver
+
+
+def main():
+    d = frc_vision.astra.driver.Driver()
+    d.run()
+
 
 if __name__ == "__main__":
-    d = frc_vision.astra.driver.Driver()
-    d.run(view=False)
+    main()
