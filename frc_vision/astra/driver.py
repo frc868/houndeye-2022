@@ -162,7 +162,7 @@ class Driver:
 
         CURRENT DATA STRUCTURE:
         Four arrays are output to NetworkTables, with
-        indices being constant across all arrays
+        indices being consistent across all arrays
         (that is, ball 0 will be ball 0 in color, tx, ty, and td)
         color: either "B" or "R", denotes ball color
         tx: x degree offset from center (from -30 to 30)
