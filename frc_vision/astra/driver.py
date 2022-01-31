@@ -35,7 +35,7 @@ class Driver:
     def __init__(self):
         self.create_streams()
         self.initialize_networktables()
-        self.initialize_server()
+        # self.initialize_server()
 
     def create_streams(self) -> None:
         """
@@ -228,7 +228,7 @@ class Driver:
 
                 color, tx, ty, ta = data
 
-                self.send_data(color_frame, blue_circles, red_circles, start_time)
+                # self.send_data(color_frame, blue_circles, red_circles, start_time)
                 if enable_calibration:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
                         color_frame

@@ -105,16 +105,25 @@ def calculate_distance(x: int, y: int, r: int, depth_frame: cv2Frame) -> float:
         None
 
     """
-    roi_margin = int(
-        r * 0.20
-    )  # can be adjusted to reflect the portion of the ball to test
-    x1 = max(0, x - roi_margin)
-    x2 = min(frc_vision.constants.ASTRA.RESOLUTION_W - 1, x + roi_margin)
-    y1 = max(0, y - roi_margin)
-    y2 = min(frc_vision.constants.ASTRA.RESOLUTION_H - 1, y + roi_margin)
-    roi = depth_frame[y1:y2, x1:x2]
-    distance = np.average(roi)
-
+    # roi_margin = int(
+    #     r * 0.20
+    # )  # can be adjusted to reflect the portion of the ball to test
+    # x1 = int(max(0, x - roi_margin))
+    # x2 = int(min(frc_vision.constants.ASTRA.RESOLUTION_W - 1, x + roi_margin))
+    # y1 = int(max(0, y - roi_margin))
+    # y2 = int(min(frc_vision.constants.ASTRA.RESOLUTION_H - 1, y + roi_margin))
+    # roi = depth_frame[y1:y2, x1:x2]
+    # distance = np.average(roi)
+    raw_distance = depth_frame[int(y), int(x)]
+    # print(raw_distance)
+    # distance = ((raw_distance - 1007.239)/192.461)
+    # distance = ((raw_distance - 1973.467)/164.713)
+    distance = (
+        ((1.80721769144 * (10**-12)) * raw_distance**3) +
+        ((6.91599509655 * (10**-8)) * raw_distance**2) +
+        ((3.7826696 * (10**-3)) * raw_distance) +
+        (0.418729798948999)
+    )
     return distance
 
 
