@@ -9,7 +9,12 @@ import numpy as np
 import frc_vision.constants
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((frc_vision.constants.SERVER_IP, frc_vision.constants.SERVER_PORT))
+sock.connect(
+    (
+        frc_vision.constants.SERVERS.RASPI_SERVER_IP,
+        frc_vision.constants.SERVERS.RASPI_SERVER_PORT,
+    )
+)
 
 vcap = cv2.VideoCapture(
     f"http://{frc_vision.constants.SERVERS.LIMELIGHT_SERVER_IP}:{frc_vision.constants.SERVERS.LIMELIGHT_SERVER_PORT}"
@@ -23,7 +28,7 @@ lframe = None
 def read_astra():
     global aframe
     data = b""
-    payload_size = struct.calcsize("L")
+    payload_size = struct.calcsize("Q")
     while True:
         # Receive payload with size of data
         while len(data) < payload_size:
@@ -34,7 +39,7 @@ def read_astra():
 
         # Unpack the payload and remove it from the actual frame data
         packed_msg_size = data[:payload_size]
-        msg_size = struct.unpack("L", packed_msg_size)[0]
+        msg_size = struct.unpack("Q", packed_msg_size)[0]
         data = data[payload_size:]
 
         # Recieve the rest of the incoming frame data
@@ -67,7 +72,7 @@ t2 = threading.Thread(target=read_limelight)
 t1.start()
 t2.start()
 
-view_front = False
+view_front = True
 while True:
     key = cv2.waitKey(15)
     if key == frc_vision.constants.KEYS.CLIENT_SWITCH_KEY:
