@@ -106,6 +106,7 @@ def calculate_distance(x: int, y: int, r: int, depth_frame: cv2Frame) -> float:
 
     """
     raw_distance = depth_frame[int(y), int(x)]
+    raw_distance = int(raw_distance)
     distance = (
         ((1.80721769144085 * (10 ** -12)) * raw_distance ** 3)
         + ((6.9159950965501 * (10 ** -8)) * raw_distance ** 2)
