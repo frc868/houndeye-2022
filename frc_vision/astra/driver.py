@@ -1,9 +1,11 @@
 import logging
+import os
 import pickle
 import socket
 import struct
 import time
 import typing
+from asyncio import subprocess
 
 import cv2
 import networktables
@@ -91,6 +93,7 @@ class Driver:
         """Connects to NetworkTables on the roboRIO."""
         NetworkTables.initialize(server=frc_vision.constants.SERVERS.ROBORIO_SERVER_IP)
         self.table = NetworkTables.getTable("FRCVision")
+        self.sd = NetworkTables.getTable("SmartDashboard")
 
     def initialize_server(self):
         """
@@ -211,6 +214,12 @@ class Driver:
             message = struct.pack("Q", len(data)) + data
             self.client.sendall(message)
             # cv2.imshow("transmit", frame)
+
+    def write_rpi_temps(self):
+        """Runs `vcgencmd measure_temp` to get the current temperature of the RPI and sends it to SmartDashboard."""
+        raw_output = subprocess.run(["vcgencmd", "measure_temp"]).stdout
+        trimmed_output = raw_output.lstrip("temp=").rstrip("'C")
+        self.sd.putNumber("rpi_temp", float(trimmed_output))
 
     def run(self, enable_calibration: bool = False) -> None:
         """Main driver to run the detection program."""
