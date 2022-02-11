@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 import frc_vision.constants
 import frc_vision.utils
@@ -68,7 +69,7 @@ def find_circles(mask: cv2Frame, depth_frame: cv2Frame) -> circles:
     for c in cnts:
         ((x, y), r) = cv2.minEnclosingCircle(c)
 
-        circle_area = 3.14 * r ** 2
+        circle_area = math.pi * r ** 2
         contour_area = cv2.contourArea(c)
 
         circle_validators = [

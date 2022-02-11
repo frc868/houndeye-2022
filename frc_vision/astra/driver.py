@@ -32,12 +32,21 @@ class Driver:
     color_stream: typing.Optional[openni2.VideoStream]
     depth_stream: typing.Optional[openni2.VideoStream]
     table: networktables.NetworkTable
-    client = None
+    client: socket.SocketIO
+    enable_calibration: bool
+    enable_networking: bool
 
-    def __init__(self):
+    def __init__(self, enable_calibration: bool = False, enable_networking: bool = True):
         self.create_streams()
         self.initialize_networktables()
-        self.initialize_server()
+        
+        self.client = None
+        
+        self.enable_calibration = enable_calibration
+        self.enable_networking = enable_networking
+        
+        if self.enable_networking:
+            self.initialize_server()
 
     def create_streams(self) -> None:
         """
@@ -221,9 +230,9 @@ class Driver:
         trimmed_output = raw_output.lstrip("temp=").rstrip("'C")
         self.sd.putNumber("rpi_temp", float(trimmed_output))
 
-    def run(self, enable_calibration: bool = False) -> None:
+    def run(self) -> None:
         """Main driver to run the detection program."""
-        if enable_calibration:
+        if self.enable_calibration:
             frc_vision.calibration.initalize_calibrators()
 
         running = True
@@ -237,8 +246,9 @@ class Driver:
 
                 color, tx, ty, ta = data
 
-                self.send_data(color_frame, blue_circles, red_circles, start_time)
-                if enable_calibration:
+                if self.enable_networking:
+                    self.send_data(color_frame, blue_circles, red_circles, start_time)
+                if self.enable_calibration:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
                         color_frame
                     )
@@ -261,9 +271,9 @@ class Driver:
                         ],
                         start_time=start_time,
                     )
-
-                if enable_calibration:
+                    
                     frc_vision.calibration.update_calibrators()
+                    
 
                 if cv2.waitKey(15) == frc_vision.constants.KEYS.CV2_WAIT_KEY:
                     running = False
