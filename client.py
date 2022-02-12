@@ -25,6 +25,7 @@ aframe = None
 lframe = None
 running = True
 
+
 def read_astra():
     global aframe
     data = b""

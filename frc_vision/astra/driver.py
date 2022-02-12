@@ -3,10 +3,10 @@ import os
 import pickle
 import socket
 import struct
-import time
-import threading
-import typing
 import subprocess
+import threading
+import time
+import typing
 
 import cv2
 import networktables
@@ -37,15 +37,17 @@ class Driver:
     enable_calibration: bool
     enable_networking: bool
 
-    def __init__(self, enable_calibration: bool = False, enable_networking: bool = True):
+    def __init__(
+        self, enable_calibration: bool = False, enable_networking: bool = True
+    ):
         self.create_streams()
         self.initialize_networktables()
-        
+
         self.client = None
-        
+
         self.enable_calibration = enable_calibration
         self.enable_networking = enable_networking
-        
+
         if self.enable_networking:
             self.initialize_server()
 
@@ -217,7 +219,6 @@ class Driver:
         if not self.client:
             self.client, addr = self.sock.accept()
 
-
     def send_data(self, frame, blue_circles, red_circles, start_time):
         """Sends frame data with annotations to the driver's station."""
         if self.client:
@@ -235,7 +236,9 @@ class Driver:
 
     def write_rpi_temps(self):
         """Runs `vcgencmd measure_temp` to get the current temperature of the RPI and sends it to SmartDashboard."""
-        raw_output = subprocess.run(["vcgencmd", "measure_temp"], capture_output=True, text=True).stdout
+        raw_output = subprocess.run(
+            ["vcgencmd", "measure_temp"], capture_output=True, text=True
+        ).stdout
         trimmed_output = raw_output.lstrip("temp=").rstrip("'C\n")
         self.sd.putNumber("rpi_temp", float(trimmed_output))
 
@@ -285,9 +288,8 @@ class Driver:
                         ],
                         start_time=start_time,
                     )
-                    
+
                     frc_vision.calibration.update_calibrators()
-                    
 
                 self.write_rpi_temps()
 

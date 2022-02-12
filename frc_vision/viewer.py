@@ -52,13 +52,17 @@ def draw_circles(
         for (x, y, r, d) in blue_circles:
             cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
-            cv2.putText(frame, str(d), (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255))
+            cv2.putText(
+                frame, str(d), (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255)
+            )
 
     if red_circles is not None:
         for (x, y, r, d) in red_circles:
             cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
             cv2.circle(frame, (x, y), 2, (0, 255, 0), 3)
-            cv2.putText(frame, str(d), (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
+            cv2.putText(
+                frame, str(d), (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0)
+            )
 
     return frame
 
