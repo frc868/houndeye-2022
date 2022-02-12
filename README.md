@@ -30,3 +30,7 @@ Do not commit changes to the `constants.py` file. These values have been calibra
 Refer to the TechHOUNDS coding style guide. Although this is for Java, there is still valuable information for other languages. If your question is not answered by that, use the Google style guide for Python. Documentation is expected for all modules, classes, and functions, and all functions should be type-hinted. For all difficult to understand code, either simplify it or add comments.
 
 Note: for consistency's sake, whenever using both blue and red detection in the same function the order for params and return vars should be `blue, red`.
+
+## `scripts` Folder
+
+If setting this repository up on any new Raspberry Pi, copy the contents of the `scripts` folder to `/home/pi`. This is necessary because static IP addressing based on SSID doesn't work when connected via Ethernet, so we have to manually enable and disable static IP addressing when we want to connect to a different network like CCS. Run `sudo ./enable_static.sh` to enable static IP addressing (on the robot network, usually), and run `sudo ./disable_static.sh` to disable static IP addressing (on CCS, or any Internet-connected network).
