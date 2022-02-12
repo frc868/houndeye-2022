@@ -4,8 +4,9 @@ import pickle
 import socket
 import struct
 import time
+import threading
 import typing
-from asyncio import subprocess
+import subprocess
 
 import cv2
 import networktables
@@ -211,29 +212,41 @@ class Driver:
 
         return blue_circles, red_circles, data
 
-    def send_data(self, frame, blue_circles, red_circles, start_time):
-        """Sends frame data with annotations to the driver's station."""
-        frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
-        frame = frc_vision.viewer.draw_metrics(frame, start_time)
+    def wait_for_connection(self):
+        """Used to make sure network connection is non-blocking."""
         if not self.client:
             self.client, addr = self.sock.accept()
+
+
+    def send_data(self, frame, blue_circles, red_circles, start_time):
+        """Sends frame data with annotations to the driver's station."""
         if self.client:
+            frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
+            frame = frc_vision.viewer.draw_metrics(frame, start_time)
             frame = cv2.resize(frame, (320, 240))
             data = pickle.dumps(frame)
             message = struct.pack("Q", len(data)) + data
-            self.client.sendall(message)
-            # cv2.imshow("transmit", frame)
+            try:
+                self.client.sendall(message)
+            except (ConnectionResetError, IOError):
+                self.client = None
+                conn_thread = threading.Thread(target=self.wait_for_connection)
+                conn_thread.start()
 
     def write_rpi_temps(self):
         """Runs `vcgencmd measure_temp` to get the current temperature of the RPI and sends it to SmartDashboard."""
-        raw_output = subprocess.run(["vcgencmd", "measure_temp"]).stdout
-        trimmed_output = raw_output.lstrip("temp=").rstrip("'C")
+        raw_output = subprocess.run(["vcgencmd", "measure_temp"], capture_output=True, text=True).stdout
+        trimmed_output = raw_output.lstrip("temp=").rstrip("'C\n")
         self.sd.putNumber("rpi_temp", float(trimmed_output))
 
     def run(self) -> None:
         """Main driver to run the detection program."""
         if self.enable_calibration:
             frc_vision.calibration.initalize_calibrators()
+
+        if self.enable_networking:
+            conn_thread = threading.Thread(target=self.wait_for_connection)
+            conn_thread.start()
 
         running = True
         while running:
@@ -248,6 +261,7 @@ class Driver:
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)
+
                 if self.enable_calibration:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
                         color_frame
@@ -274,6 +288,8 @@ class Driver:
                     
                     frc_vision.calibration.update_calibrators()
                     
+
+                self.write_rpi_temps()
 
                 if cv2.waitKey(15) == frc_vision.constants.KEYS.CV2_WAIT_KEY:
                     running = False
