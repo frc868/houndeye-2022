@@ -23,13 +23,13 @@ vcap = cv2.VideoCapture(
 
 aframe = None
 lframe = None
-
+running = True
 
 def read_astra():
     global aframe
     data = b""
     payload_size = struct.calcsize("Q")
-    while True:
+    while running:
         # Receive payload with size of data
         while len(data) < payload_size:
             packet = sock.recv(4096)
@@ -54,16 +54,17 @@ def read_astra():
         data = data[msg_size:]
 
         # Load data into openCV
-        aframe = pickle.loads(frame_data)
-        aframe = cv2.resize(aframe, (800, 500))
+        aframe = cv2.resize(pickle.loads(frame_data), (1280, 720))
+    return
 
 
 def read_limelight():
     global lframe
-    while True:
+    while running:
         ret, frame = vcap.read()
         if ret:
-            lframe = cv2.resize(frame, (800, 500))
+            lframe = cv2.resize(frame, (1280, 720))
+    return
 
 
 t1 = threading.Thread(target=read_astra)
@@ -73,12 +74,12 @@ t1.start()
 t2.start()
 
 view_front = True
-while True:
+while running:
     key = cv2.waitKey(15)
     if key == frc_vision.constants.KEYS.CLIENT_SWITCH_KEY:
         view_front = not view_front
     if key == frc_vision.constants.KEYS.CV2_WAIT_KEY:  # esc
-        break
+        running = False
 
     if view_front:
         cv2.imshow("receive", lframe)
