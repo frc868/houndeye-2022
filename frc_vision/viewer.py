@@ -67,21 +67,14 @@ def draw_metrics(
     frame, start_time: float, data: tuple[ViewerData] = []
 ) -> frc_vision.utils.cv2Frame:
     """Draws metrics to the frame. Also draws FPS."""
-    cv2.putText(
-        frame,
-        f"fps: {round(1.0 / (time.time() - start_time), 2)}",
-        (20, 80),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0, 255, 0),
-    )
+    data = [ViewerData("FPS", round(1.0 / (time.time() - start_time), 2))] + data
     for idx, d in enumerate(data):
         cv2.putText(
             frame,
             f"{d.name}: {d.value}",
-            (20, 40 + (20 * idx)),
+            (20, 40 + (30 * (idx))),
             cv2.FONT_HERSHEY_SIMPLEX,
-            1,
+            0.75,
             (0, 255, 0),
         )
     return frame
