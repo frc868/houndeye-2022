@@ -153,4 +153,6 @@ def zip_networktables_data(txb, tyb, txr, tyr, tdb, tdr):
     tx = txb + txr
     ty = tyb + tyr
     td = tdb + tdr
+    s = sorted(zip(color, tx, ty, td), key=lambda x: x[3])  # sorts by distance
+    color, tx, ty, td = zip(*s)
     return color, tx, ty, td
