@@ -4,7 +4,6 @@ import struct
 import threading
 
 import cv2
-import numpy as np
 
 import frc_vision.constants
 

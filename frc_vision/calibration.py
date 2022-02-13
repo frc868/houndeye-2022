@@ -1,7 +1,5 @@
 import tkinter as tk
 
-import cv2
-
 import frc_vision.constants
 
 """
