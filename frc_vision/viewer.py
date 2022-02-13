@@ -67,11 +67,16 @@ def draw_circles(
     return frame
 
 
+def calculate_fps(start_time: float) -> float:
+    """Calculates FPS given a start time."""
+    return round(1.0 / (time.time() - start_time), 2)
+
+
 def draw_metrics(
-    frame, start_time: float, data: tuple[ViewerData] = []
+    frame, start_time: float, data: tuple[ViewerData] = ()
 ) -> frc_vision.utils.cv2Frame:
     """Draws metrics to the frame. Also draws FPS."""
-    data = [ViewerData("FPS", round(1.0 / (time.time() - start_time), 2))] + data
+    data = (ViewerData("FPS", calculate_fps()),) + data
     for idx, d in enumerate(data):
         cv2.putText(
             frame,
@@ -96,6 +101,7 @@ def view(
     for vframe in frames:
         frame = vframe.frame
         if vframe.show_data:
-            frame = draw_circles(frame, circles[0], circles[1])
+            blue_circles, red_circles = circles
+            frame = draw_circles(frame, blue_circles, red_circles)
             frame = draw_metrics(frame, start_time, data)
         cv2.imshow(vframe.name, frame)

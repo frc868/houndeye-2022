@@ -110,8 +110,6 @@ class Driver:
     def initialize_server(self):
         """
         Initializes server socket.
-        (Currently, this is blocking until a client connects)
-        TODO: add threading to prevent this
         """
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind(
@@ -258,12 +256,13 @@ class Driver:
                 color_frame, depth_frame = self.get_frames()
                 blue_circles, red_circles, data = self.process_frame(
                     color_frame, depth_frame
-                )  # temp result for debug, will remove or move to calibration only for efficiency's sake
+                )
 
                 color, tx, ty, ta = data
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)
+                    self.write_rpi_temps()
 
                 if self.enable_calibration:
                     blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
@@ -280,18 +279,16 @@ class Driver:
                             frc_vision.viewer.ViewerFrame(red_mask, "red"),
                         ),
                         circles=(blue_circles, red_circles),
-                        data=[
+                        data=(
                             frc_vision.viewer.ViewerData("color", color),
                             frc_vision.viewer.ViewerData("tx", tx),
                             frc_vision.viewer.ViewerData("ty", ty),
                             frc_vision.viewer.ViewerData("ta", ta),
-                        ],
+                        ),
                         start_time=start_time,
                     )
 
                     frc_vision.calibration.update_calibrators()
-
-                self.write_rpi_temps()
 
                 if cv2.waitKey(15) == frc_vision.constants.KEYS.CV2_WAIT_KEY:
                     running = False
