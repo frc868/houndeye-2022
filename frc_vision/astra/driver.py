@@ -241,6 +241,8 @@ class Driver:
 
     def run(self) -> None:
         """Main driver to run the detection program."""
+        frc_vision.constants.load_constants()
+
         if self.enable_calibration:
             frc_vision.calibration.initalize_calibrators()
 
