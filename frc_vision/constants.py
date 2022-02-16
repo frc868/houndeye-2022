@@ -1,3 +1,4 @@
+from ast import List
 import json
 
 import numpy as np
@@ -8,15 +9,17 @@ CONSTANTS_FILE = "constants.json"
 def load_constants():
     with open(CONSTANTS_FILE, "r") as f:
         data = json.load(f)
-        HSV_BOUNDS.ASTRA.BLUE_BOUND_L = np.ndarray(data["HSV_BOUNDS"]["BLUE_BOUND_L"])
-        HSV_BOUNDS.ASTRA.BLUE_BOUND_U = np.ndarray(data["HSV_BOUNDS"]["BLUE_BOUND_U"])
-        HSV_BOUNDS.ASTRA.RED_BOUND_L = np.ndarray(data["HSV_BOUNDS"]["RED_BOUND_L"])
-        HSV_BOUNDS.ASTRA.RED_BOUND_U = np.ndarray(data["HSV_BOUNDS"]["RED_BOUND_U"])
-        HSV_BOUNDS.ASTRA.RED_BOUND_L2 = np.ndarray(
-            data["HSV_BOUNDS"]["RED_H_L2"] + [HSV_BOUNDS.ASTRA.RED_BOUND_L[1:2]]
+        print(data["HSV_BOUNDS"]["BLUE_BOUND_L"])
+
+        HSV_BOUNDS.ASTRA.BLUE_BOUND_L = np.array(data["HSV_BOUNDS"]["BLUE_BOUND_L"])
+        HSV_BOUNDS.ASTRA.BLUE_BOUND_U = np.array(data["HSV_BOUNDS"]["BLUE_BOUND_U"])
+        HSV_BOUNDS.ASTRA.RED_BOUND_L = np.array(data["HSV_BOUNDS"]["RED_BOUND_L"])
+        HSV_BOUNDS.ASTRA.RED_BOUND_U = np.array(data["HSV_BOUNDS"]["RED_BOUND_U"])
+        HSV_BOUNDS.ASTRA.RED_BOUND_L2 = np.array(
+            data["HSV_BOUNDS"]["RED_H_L2"] + [int(HSV_BOUNDS.ASTRA.RED_BOUND_L[1]), int(HSV_BOUNDS.ASTRA.RED_BOUND_L[2])]
         )
-        HSV_BOUNDS.ASTRA.RED_BOUND_U2 = np.ndarray(
-            data["HSV_BOUNDS"]["RED_H_U2"] + [HSV_BOUNDS.ASTRA.RED_BOUND_U[1:2]]
+        HSV_BOUNDS.ASTRA.RED_BOUND_U2 = np.array(
+            data["HSV_BOUNDS"]["RED_H_U2"] + [int(HSV_BOUNDS.ASTRA.RED_BOUND_U[1]), int(HSV_BOUNDS.ASTRA.RED_BOUND_U[2])]
         )
         CIRCLE_COMPARISON_THRESHOLD = data["CIRCLE_COMPARISON_THRESHOLD"]
 
@@ -26,10 +29,10 @@ def dump_constants():
         json.dump(
             {
                 "HSV_BOUNDS": {
-                    "BLUE_BOUND_L": [HSV_BOUNDS.ASTRA.BLUE_BOUND_L[0:2]],
-                    "BLUE_BOUND_U": [HSV_BOUNDS.ASTRA.BLUE_BOUND_U[0:2]],
-                    "RED_BOUND_L": [HSV_BOUNDS.ASTRA.RED_BOUND_L[0:2]],
-                    "RED_BOUND_U": [HSV_BOUNDS.ASTRA.RED_BOUND_U[0:2]],
+                    "BLUE_BOUND_L": [HSV_BOUNDS.ASTRA.BLUE_BOUND_L.tolist()],
+                    "BLUE_BOUND_U": [HSV_BOUNDS.ASTRA.BLUE_BOUND_U.tolist()],
+                    "RED_BOUND_L": [HSV_BOUNDS.ASTRA.RED_BOUND_L.tolist()],
+                    "RED_BOUND_U": [HSV_BOUNDS.ASTRA.RED_BOUND_U.tolist()],
                     "RED_H_L2": [HSV_BOUNDS.ASTRA.RED_BOUND_L2[0]],
                     "RED_H_U2": [HSV_BOUNDS.ASTRA.RED_BOUND_U2[0]],
                 },
