@@ -68,6 +68,9 @@ def initalize_calibrators():
 
     create_scale(50, 300, "Circle", int(frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD*100))
 
+    b = tk.Button(root, text="Save constants to file", command=frc_vision.constants.dump_constants)
+    b.pack()
+
 
 def calibrators(key: str, value: str):
     """
