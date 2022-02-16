@@ -20,9 +20,7 @@ if __name__ == "__main__":
     while True:
         try:
             main()
-        except KeyboardInterrupt:
-            break
-        except:
-            pass
+        except Exception as e:
+            print(e)
         else:
             break
