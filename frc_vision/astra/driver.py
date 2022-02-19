@@ -29,7 +29,7 @@ class AstraException(Exception):
 
 
 class Driver:
-    color_stream: typing.Optional[openni2.VideoStream]
+    color_stream: typing.Optional[cv2.VideoCapture]
     depth_stream: typing.Optional[openni2.VideoStream]
     table: networktables.NetworkTable
     client: socket.SocketIO
@@ -72,16 +72,19 @@ class Driver:
         device = openni2.Device.open_any()
 
         logger.info("Creating color stream")
-        self.color_stream = device.create_color_stream()
-        self.color_stream.set_video_mode(
-            c_api.OniVideoMode(
-                pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888,
-                resolutionX=frc_vision.constants.ASTRA.RESOLUTION_W,
-                resolutionY=frc_vision.constants.ASTRA.RESOLUTION_H,
-                fps=frc_vision.constants.ASTRA.FPS,
-            )
+        self.color_stream = cv2.VideoCapture(0, cv2.CAP_V4L2)
+        # Set width and height
+        self.color_stream.set(
+            cv2.CAP_PROP_FRAME_WIDTH, frc_vision.constants.ASTRA.RESOLUTION_W
         )
-        self.color_stream.start()
+        self.color_stream.set(
+            cv2.CAP_PROP_FRAME_HEIGHT, frc_vision.constants.ASTRA.RESOLUTION_H
+        )
+        # Set manual exposure
+        self.color_stream.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
+        self.color_stream.set(
+            cv2.CAP_PROP_EXPOSURE, 0
+        )  # TODO: test out different values here, maybe run `v4l2-ctl --device /dev/video0 -l`
 
         # pixelFormat can also be "ONI_PIXEL_FORMAT_DEPTH_1_MM"
         logger.info("Creating depth stream")
@@ -135,10 +138,7 @@ class Driver:
             None
         """
 
-        raw_color_frame = self.color_stream.read_frame()
-        color_frame = np.frombuffer(
-            raw_color_frame.get_buffer_as_uint8(), dtype=np.uint8
-        )
+        ret, color_frame = self.color_stream.read()
         color_frame.shape = (
             frc_vision.constants.ASTRA.RESOLUTION_H,
             frc_vision.constants.ASTRA.RESOLUTION_W,
