@@ -1,5 +1,4 @@
 import json
-from ast import List
 
 import numpy as np
 
