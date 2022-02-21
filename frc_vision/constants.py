@@ -8,26 +8,28 @@ CONSTANTS_FILE = "constants.json"
 def load_constants():
     with open(CONSTANTS_FILE, "r") as f:
         data = json.load(f)
-        print(data["HSV_BOUNDS"]["BLUE_BOUND_L"])
 
-        ASTRA.HSV_BOUNDS.BLUE_BOUND_L = np.array(data["HSV_BOUNDS"]["BLUE_BOUND_L"])
-        ASTRA.HSV_BOUNDS.BLUE_BOUND_U = np.array(data["HSV_BOUNDS"]["BLUE_BOUND_U"])
-        ASTRA.HSV_BOUNDS.RED_BOUND_L = np.array(data["HSV_BOUNDS"]["RED_BOUND_L"])
-        ASTRA.HSV_BOUNDS.RED_BOUND_U = np.array(data["HSV_BOUNDS"]["RED_BOUND_U"])
+        ASTRA.HSV_BOUNDS.BLUE_BOUND_L = np.array(data["ASTRA"]["HSV_BOUNDS"]["BLUE_BOUND_L"])
+        ASTRA.HSV_BOUNDS.BLUE_BOUND_U = np.array(data["ASTRA"]["HSV_BOUNDS"]["BLUE_BOUND_U"])
+        ASTRA.HSV_BOUNDS.RED_BOUND_L = np.array(data["ASTRA"]["HSV_BOUNDS"]["RED_BOUND_L"])
+        ASTRA.HSV_BOUNDS.RED_BOUND_U = np.array(data["ASTRA"]["HSV_BOUNDS"]["RED_BOUND_U"])
         ASTRA.HSV_BOUNDS.RED_BOUND_L2 = np.array(
-            data["HSV_BOUNDS"]["RED_H_L2"]
+            data["ASTRA"]["HSV_BOUNDS"]["RED_H_L2"]
             + [
                 int(ASTRA.HSV_BOUNDS.RED_BOUND_L[1]),
                 int(ASTRA.HSV_BOUNDS.RED_BOUND_L[2]),
             ]
         )
         ASTRA.HSV_BOUNDS.RED_BOUND_U2 = np.array(
-            data["HSV_BOUNDS"]["RED_H_U2"]
+            data["ASTRA"]["HSV_BOUNDS"]["RED_H_U2"]
             + [
                 int(ASTRA.HSV_BOUNDS.RED_BOUND_U[1]),
                 int(ASTRA.HSV_BOUNDS.RED_BOUND_U[2]),
             ]
         )
+        ASTRA.EXPOSURE = data["ASTRA"]["EXPOSURE"]
+        ASTRA.GAIN = data["ASTRA"]["GAIN"]
+
         CIRCLE_COMPARISON_THRESHOLD = data["CIRCLE_COMPARISON_THRESHOLD"]
 
 
@@ -35,13 +37,17 @@ def dump_constants():
     with open(CONSTANTS_FILE, "w") as f:
         json.dump(
             {
-                "HSV_BOUNDS": {
-                    "BLUE_BOUND_L": [ASTRA.HSV_BOUNDS.BLUE_BOUND_L.tolist()],
-                    "BLUE_BOUND_U": [ASTRA.HSV_BOUNDS.BLUE_BOUND_U.tolist()],
-                    "RED_BOUND_L": [ASTRA.HSV_BOUNDS.RED_BOUND_L.tolist()],
-                    "RED_BOUND_U": [ASTRA.HSV_BOUNDS.RED_BOUND_U.tolist()],
-                    "RED_H_L2": [ASTRA.HSV_BOUNDS.RED_BOUND_L2[0]],
-                    "RED_H_U2": [ASTRA.HSV_BOUNDS.RED_BOUND_U2[0]],
+                "ASTRA": {
+                    "HSV_BOUNDS": {
+                        "BLUE_BOUND_L": ASTRA.HSV_BOUNDS.BLUE_BOUND_L.tolist(),
+                        "BLUE_BOUND_U": ASTRA.HSV_BOUNDS.BLUE_BOUND_U.tolist(),
+                        "RED_BOUND_L": ASTRA.HSV_BOUNDS.RED_BOUND_L.tolist(),
+                        "RED_BOUND_U": ASTRA.HSV_BOUNDS.RED_BOUND_U.tolist(),
+                        "RED_H_L2": [int(ASTRA.HSV_BOUNDS.RED_BOUND_L2[0])],
+                        "RED_H_U2": [int(ASTRA.HSV_BOUNDS.RED_BOUND_U2[0])]
+                    },
+                    "EXPOSURE": ASTRA.EXPOSURE,
+                    "GAIN": ASTRA.GAIN
                 },
                 "CIRCLE_COMPARISON_THRESHOLD": CIRCLE_COMPARISON_THRESHOLD,
             },
@@ -72,25 +78,16 @@ class ASTRA:
     FPS = 30
 
     class HSV_BOUNDS:
-        BLUE_BOUND_L = np.array(
-            [98, 116, 59]
-        )  # lower bound for blue ball, in format [H, S, V]
-        BLUE_BOUND_U = np.array(
-            [121, 223, 255]
-        )  # upper bound for blue ball, in format [H, S, V]
+        BLUE_BOUND_L: np.array # constants.json
+        BLUE_BOUND_U: np.array # constants.json
 
-        RED_BOUND_L = np.array(
-            [169, 83, 0]
-        )  # lower bound for the first red ball mask, in format [H, S, V]
-        RED_BOUND_U = np.array(
-            [179, 250, 255]
-        )  # upper bound for first red ball mask, in format [H, S, V]
-        RED_BOUND_L2 = np.array(
-            [0, RED_BOUND_L[1], RED_BOUND_L[2]]
-        )  # lower bound for second red ball mask, in format [H, S, V]
-        RED_BOUND_U2 = np.array(
-            [20, RED_BOUND_U[1], RED_BOUND_U[2]]
-        )  # upper bound for second red ball mask, in format [H, S, V]
+        RED_BOUND_L: np.array # constants.json
+        RED_BOUND_U : np.array # constants.json
+        RED_BOUND_L2: np.array # constants.json
+        RED_BOUND_U2: np.array # constants.json
+
+    EXPOSURE: int # constants.json
+    GAIN: int # constants.json
 
 
 CIRCLE_COMPARISON_THRESHOLD = 1.8

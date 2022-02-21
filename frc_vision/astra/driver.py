@@ -72,19 +72,19 @@ class Driver:
         device = openni2.Device.open_any()
 
         logger.info("Creating color stream")
-        self.color_stream = cv2.VideoCapture(0, cv2.CAP_V4L2)
-        # Set width and height
-        self.color_stream.set(
-            cv2.CAP_PROP_FRAME_WIDTH, frc_vision.constants.ASTRA.RESOLUTION_W
+        self.color_stream = device.create_color_stream()
+        self.camera_settings = openni2.CameraSettings(self.color_stream)
+        self.camera_settings.set_auto_exposure(False)
+        self.camera_settings.set_auto_white_balance(False)
+        self.color_stream.set_video_mode(
+            c_api.OniVideoMode(
+                pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888,
+                resolutionX=frc_vision.constants.ASTRA.RESOLUTION_W,
+                resolutionY=frc_vision.constants.ASTRA.RESOLUTION_H,
+                fps=frc_vision.constants.ASTRA.FPS,
+            )
         )
-        self.color_stream.set(
-            cv2.CAP_PROP_FRAME_HEIGHT, frc_vision.constants.ASTRA.RESOLUTION_H
-        )
-        # Set manual exposure
-        self.color_stream.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
-        self.color_stream.set(
-            cv2.CAP_PROP_EXPOSURE, 0
-        )  # TODO: test out different values here, maybe run `v4l2-ctl --device /dev/video0 -l`
+        self.color_stream.start()
 
         # pixelFormat can also be "ONI_PIXEL_FORMAT_DEPTH_1_MM"
         logger.info("Creating depth stream")
@@ -138,7 +138,10 @@ class Driver:
             None
         """
 
-        ret, color_frame = self.color_stream.read()
+        raw_color_frame = self.color_stream.read_frame()
+        color_frame = np.frombuffer(
+            raw_color_frame.get_buffer_as_uint8(), dtype=np.uint8
+        )
         color_frame.shape = (
             frc_vision.constants.ASTRA.RESOLUTION_H,
             frc_vision.constants.ASTRA.RESOLUTION_W,
@@ -260,6 +263,9 @@ class Driver:
                 )
 
                 color, tx, ty, ta = data
+
+                self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)
+                self.camera_settings.set_gain(frc_vision.constants.ASTRA.GAIN)
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)

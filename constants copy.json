@@ -1,0 +1,35 @@
+{
+    "ASTRA": {
+        "HSV_BOUNDS": {
+            "BLUE_BOUND_L": [
+                98,
+                116,
+                59
+            ],
+            "BLUE_BOUND_U": [
+                121,
+                223,
+                255
+            ],
+            "RED_BOUND_L": [
+                169,
+                83,
+                0
+            ],
+            "RED_BOUND_U": [
+                179,
+                250,
+                255
+            ],
+            "RED_H_L2": [
+                0
+            ],
+            "RED_H_U2": [
+                20
+            ]
+        },
+        "EXPOSURE": 50,
+        "GAIN": 50
+    },
+    "CIRCLE_COMPARISON_THRESHOLD": 20
+}
