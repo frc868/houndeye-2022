@@ -73,7 +73,7 @@ def find_circles(mask: cv2Frame, depth_frame: cv2Frame) -> circles:
         contour_area = cv2.contourArea(c)
 
         circle_validators = [
-            r > 10,
+            r > 5,
             (
                 (circle_area / contour_area)
                 < frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD
