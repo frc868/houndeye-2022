@@ -29,7 +29,7 @@ class AstraException(Exception):
 
 
 class Driver:
-    color_stream: typing.Optional[openni2.VideoStream]
+    color_stream: typing.Optional[cv2.VideoCapture]
     depth_stream: typing.Optional[openni2.VideoStream]
     table: networktables.NetworkTable
     client: socket.SocketIO
@@ -73,6 +73,9 @@ class Driver:
 
         logger.info("Creating color stream")
         self.color_stream = device.create_color_stream()
+        self.camera_settings = openni2.CameraSettings(self.color_stream)
+        self.camera_settings.set_auto_exposure(False)
+        self.camera_settings.set_auto_white_balance(False)
         self.color_stream.set_video_mode(
             c_api.OniVideoMode(
                 pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888,
@@ -260,6 +263,9 @@ class Driver:
                 )
 
                 color, tx, ty, ta = data
+
+                self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)
+                self.camera_settings.set_gain(frc_vision.constants.ASTRA.GAIN)
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)

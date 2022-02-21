@@ -29,19 +29,19 @@ def generate_masks(
 
     blue_mask = cv2.inRange(
         hsv,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_L,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.BLUE_BOUND_U,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U,
     )
 
     red_mask1 = cv2.inRange(
         hsv,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U,
     )
     red_mask2 = cv2.inRange(
         hsv,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_L2,
-        frc_vision.constants.HSV_BOUNDS.ASTRA.RED_BOUND_U2,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2,
+        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2,
     )
     red_mask = red_mask1 | red_mask2
 

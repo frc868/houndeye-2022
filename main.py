@@ -1,4 +1,5 @@
 import argparse
+import traceback
 
 import frc_vision.astra.driver
 
@@ -20,7 +21,9 @@ if __name__ == "__main__":
     while True:
         try:
             main()
-        except Exception as e:
-            print(e)
+        except KeyboardInterrupt:
+            break
+        except:
+            traceback.print_exc()
         else:
             break
