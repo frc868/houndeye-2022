@@ -36,6 +36,7 @@ def initalize_calibrators():
     Check if calibration is on, and if so, enable trackbars.
     """
     global root
+    global color
 
     root = tk.Tk()
 
@@ -65,9 +66,6 @@ def initalize_calibrators():
 
     create_label("Circle Comparison Threshold")
     create_scale(50, 300, "Circle", int(frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD*100))
-
-    b = tk.Button(root, text="Save constants to file", command=frc_vision.constants.dump_constants)
-    b.pack()
         
     create_label("Exposure")
     create_scale(0, 500, "exp", frc_vision.constants.ASTRA.EXPOSURE)
@@ -75,6 +73,42 @@ def initalize_calibrators():
     create_label("Gain")
     create_scale(0, 500, "gain", frc_vision.constants.ASTRA.GAIN)
 
+    save_b = tk.Button(root, text="Save constants to file", command=frc_vision.constants.dump_constants)
+    save_b.pack()
+
+    create_label("Utilities")
+    
+    color = "blue"
+
+    def color_b_callback():
+        global color
+        color = "blue" if color == "red" else "red"
+        if color == "blue":
+            color_b.configure(text="  BLUE  ", bg="blue")
+        elif color == "red":
+            color_b.configure(text="  RED  ", bg="red")
+
+
+    color_b = tk.Button(root, text="  BLUE  ", bg="blue", command=color_b_callback)
+    color_b.pack()
+
+    def center_b_callback():
+        pass
+
+    center_b = tk.Button(root, text="Center values", command=center_b_callback)
+    center_b.pack()
+
+    def include_b_callback():
+        pass
+
+    include_b = tk.Button(root, text="Include pixel", command=include_b_callback)
+    include_b.pack()
+
+    def exclude_b_callback():
+        pass
+
+    exclude_b = tk.Button(root, text="Exclude pixel", command=exclude_b_callback)
+    exclude_b.pack()
 
 
 def calibrators(key: str, value: str):
@@ -101,6 +135,13 @@ def calibrators(key: str, value: str):
     if key == "gain": frc_vision.constants.ASTRA.GAIN = int(value)
 
 
+
 def update_calibrators():
     root.update()
     root.update_idletasks()
+
+
+if __name__ == "__main__":
+    initalize_calibrators()
+    while True:
+        update_calibrators()
