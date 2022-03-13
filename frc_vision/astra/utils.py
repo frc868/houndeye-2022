@@ -147,15 +147,11 @@ def calculate_angles(circles: circles):
     return tx, ty
 
 
-def zip_networktables_data(txb, tyb, txr, tyr, tdb, tdr):
+def zip_networktables_data(tx, ty, td):
     """Add color information and zip data for NetworkTables transmission."""
-    color = ["B" for x in txb] + ["R" for x in txr]
-    tx = txb + txr
-    ty = tyb + tyr
-    td = tdb + tdr
-    if not color:
-        return color, tx, ty, td
-    else:
-        s = sorted(zip(color, tx, ty, td), key=lambda x: x[3])  # sorts by distance
-        color, tx, ty, td = zip(*s)
-        return color, tx, ty, td
+    if not tx:
+        return tx, ty, td
+    else:  # code below doesn't work unless there's at least one value
+        s = sorted(zip(tx, ty, td), key=lambda x: x[2])  # sorts by distance
+        tx, ty, td = zip(*s)
+        return tx, ty, td
