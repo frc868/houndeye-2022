@@ -1,3 +1,4 @@
+import enum
 import logging
 import pickle
 import socket
@@ -7,9 +8,11 @@ import threading
 import time
 import typing
 
+import cscore
 import cv2
 import networktables
 import numpy as np
+from cscore import CameraServer
 from networktables import NetworkTables
 from openni import _openni2 as c_api
 from openni import openni2
@@ -23,24 +26,41 @@ from frc_vision.utils import circles, cv2Frame
 
 logger = logging.getLogger(__name__)  # TODO: Write logs to file.
 
+# Helper classes
+
+
+class TableGroup:
+    FRCVision: networktables.NetworkTable
+    SmartDashboard: networktables.NetworkTable
+    FMSInfo: networktables.NetworkTable
+
 
 class AstraException(Exception):
     pass
 
 
+class Alliance(enum.IntEnum):
+    BLUE = 0
+    RED = 1
+
+
 class Driver:
-    color_stream: typing.Optional[cv2.VideoCapture]
+    """Main class that runs the Astra. Uses util functions from `frc_vision.astra.utils`."""
+
+    color_stream: typing.Optional[openni2.VideoStream]
     depth_stream: typing.Optional[openni2.VideoStream]
-    table: networktables.NetworkTable
+    tables: TableGroup
     client: socket.SocketIO
     enable_calibration: bool
     enable_networking: bool
+    cs: CameraServer
+    cs_output: None
+    alliance: Alliance
 
     def __init__(
         self, enable_calibration: bool = False, enable_networking: bool = True
     ):
         self.create_streams()
-        self.initialize_networktables()
 
         self.client = None
 
@@ -48,7 +68,8 @@ class Driver:
         self.enable_networking = enable_networking
 
         if self.enable_networking:
-            self.initialize_server()
+            self.initialize_networktables()
+            self.initialize_cameraserver()
 
     def create_streams(self) -> None:
         """
@@ -106,21 +127,15 @@ class Driver:
     def initialize_networktables(self):
         """Connects to NetworkTables on the roboRIO."""
         NetworkTables.initialize(server=frc_vision.constants.SERVERS.ROBORIO_SERVER_IP)
-        self.table = NetworkTables.getTable("FRCVision")
-        self.sd = NetworkTables.getTable("SmartDashboard")
+        self.tables.FRCVision = NetworkTables.getTable("FRCVision")
+        self.tables.SmartDashboard = NetworkTables.getTable("SmartDashboard")
+        self.tables.FMSInfo = NetworkTables.getTable("FMSInfo")
+        self.set_alliance()
 
-    def initialize_server(self):
-        """
-        Initializes server socket.
-        """
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(
-            (
-                frc_vision.constants.SERVERS.RASPI_SERVER_IP,
-                frc_vision.constants.SERVERS.RASPI_SERVER_PORT,
-            )
-        )
-        self.sock.listen(5)
+    def initialize_cameraserver(self):
+        CameraServer.enableLogging()
+        self.cs = CameraServer()
+        self.cs_output = self.cs.putVideo("Astra", 320, 240)
 
     def get_frames(self) -> tuple[cv2Frame, cv2Frame]:
         """
@@ -184,11 +199,13 @@ class Driver:
         ty: y degree offset from center (from -24.75 to 24.75)
         td: distance from camera to ball
         """
-        color, tx, ty, td = data
-        self.table.putStringArray("color", color)
-        self.table.putNumberArray("tx", tx)
-        self.table.putNumberArray("ty", ty)
-        self.table.putNumberArray("td", td)
+        tx, ty, td = data
+        self.tables.FRCVision.putString(
+            "alliance", "B" if self.alliance == Alliance.BLUE else "R"
+        )
+        self.tables.FRCVision.putNumberArray("tx", tx)
+        self.tables.FRCVision.putNumberArray("ty", ty)
+        self.tables.FRCVision.putNumberArray("td", td)
 
     def process_frame(
         self, color_frame: cv2Frame, depth_frame: cv2Frame
@@ -207,40 +224,40 @@ class Driver:
         tdb = [d for x, y, r, d in blue_circles]
         tdr = [d for x, y, r, d in red_circles]
 
-        data = frc_vision.astra.utils.zip_networktables_data(
-            txb, tyb, txr, tyr, tdb, tdr
-        )
+        if self.alliance == Alliance.BLUE:
+            data = frc_vision.astra.utils.zip_networktables_data(txb, tyb, tdb)
+        else:
+            data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
+
         self.write_to_networktables(data)
-
         return blue_circles, red_circles, data
-
-    def wait_for_connection(self):
-        """Used to make sure network connection is non-blocking."""
-        if not self.client:
-            self.client, addr = self.sock.accept()
 
     def send_data(self, frame, blue_circles, red_circles, start_time):
         """Sends frame data with annotations to the driver's station."""
         if self.client:
             frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
             frame = frc_vision.viewer.draw_metrics(frame, start_time)
-            frame = cv2.resize(frame, (320, 240))
-            data = pickle.dumps(frame)
-            message = struct.pack("Q", len(data)) + data
-            try:
-                self.client.sendall(message)
-            except (ConnectionResetError, IOError):
-                self.client = None
-                conn_thread = threading.Thread(target=self.wait_for_connection)
-                conn_thread.start()
+            # frame = cv2.resize(frame, (320, 240))
+            self.cs_output.putFrame(frame)
 
     def write_rpi_temps(self):
-        """Runs `vcgencmd measure_temp` to get the current temperature of the RPI and sends it to SmartDashboard."""
+        """Runs `vcgencmd measure_temp` to get the current temperature of the Pi and sends it to SmartDashboard."""
         raw_output = subprocess.run(
             ["vcgencmd", "measure_temp"], capture_output=True, text=True
         ).stdout
         trimmed_output = raw_output.lstrip("temp=").rstrip("'C\n")
-        self.sd.putNumber("rpi_temp", float(trimmed_output))
+        self.tables.SmartDashboard.putNumber("rpi_temp", float(trimmed_output))
+
+    def set_alliance(self):
+        """
+        Checks FMSInfo to see what alliance is currently set.
+        This can be changed in practice via the Driver Station.
+        """
+        self.alliance = (
+            Alliance.RED
+            if self.tables.FMSInfo.getBoolean("isRedAlliance")
+            else Alliance.BLUE
+        )
 
     def run(self) -> None:
         """Main driver to run the detection program."""
@@ -249,9 +266,9 @@ class Driver:
         if self.enable_calibration:
             frc_vision.calibration.initalize_calibrators()
 
-        if self.enable_networking:
-            conn_thread = threading.Thread(target=self.wait_for_connection)
-            conn_thread.start()
+        # if self.enable_networking:
+        #     conn_thread = threading.Thread(target=self.wait_for_connection)
+        #     conn_thread.start()
 
         running = True
         while running:
@@ -262,13 +279,14 @@ class Driver:
                     color_frame, depth_frame
                 )
 
-                color, tx, ty, ta = data
+                tx, ty, ta = data
 
                 self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)
                 self.camera_settings.set_gain(frc_vision.constants.ASTRA.GAIN)
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)
+                    self.set_alliance()
                     self.write_rpi_temps()
 
                 if self.enable_calibration:
@@ -287,7 +305,6 @@ class Driver:
                         ),
                         circles=(blue_circles, red_circles),
                         data=(
-                            frc_vision.viewer.ViewerData("color", color),
                             frc_vision.viewer.ViewerData("tx", tx),
                             frc_vision.viewer.ViewerData("ty", ty),
                             frc_vision.viewer.ViewerData("ta", ta),

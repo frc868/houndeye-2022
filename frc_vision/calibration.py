@@ -1,5 +1,6 @@
 import tkinter as tk
 
+import frc_vision.astra.driver
 import frc_vision.constants
 
 """
@@ -9,6 +10,8 @@ Black formatter has not been applied to this file.
 """
 
 # fmt: off
+
+SCALES = {}
 
 def create_scale(from_, to, key, original_value):
     """Lessens code length in `initialize_calibrators`."""
@@ -20,6 +23,7 @@ def create_scale(from_, to, key, original_value):
         orient=tk.HORIZONTAL,
         command=lambda value: calibrators(key, value),
     )
+    SCALES[key] = s
     s.pack()
     s.set(original_value)
 
@@ -65,7 +69,7 @@ def initalize_calibrators():
     create_scale(0, 179, "HUR2", frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[0])
 
     create_label("Circle Comparison Threshold")
-    create_scale(50, 300, "Circle", int(frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD*100))
+    create_scale(50, 300, "circle", int(frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD*100))
         
     create_label("Exposure")
     create_scale(0, 500, "exp", frc_vision.constants.ASTRA.EXPOSURE)
@@ -93,7 +97,7 @@ def initalize_calibrators():
     color_b.pack()
 
     def center_b_callback():
-        pass
+        frc_vision.astra.driver
 
     center_b = tk.Button(root, text="Center values", command=center_b_callback)
     center_b.pack()
@@ -130,7 +134,7 @@ def calibrators(key: str, value: str):
     if key == "HLR2": frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2[0] = int(value)
     if key == "HUR2": frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[0] = int(value)
 
-    if key == "Circle": frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
+    if key == "circle": frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
     if key == "exp": frc_vision.constants.ASTRA.EXPOSURE = int(value)
     if key == "gain": frc_vision.constants.ASTRA.GAIN = int(value)
 
