@@ -24,7 +24,8 @@ import frc_vision.utils
 import frc_vision.viewer
 from frc_vision.utils import circles, cv2Frame
 
-logger = logging.getLogger(__name__)  # TODO: Write logs to file.
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Helper classes
 
@@ -49,13 +50,13 @@ class Driver:
 
     color_stream: typing.Optional[openni2.VideoStream]
     depth_stream: typing.Optional[openni2.VideoStream]
-    tables: TableGroup
+    tables: TableGroup = TableGroup()
     client: socket.SocketIO
     enable_calibration: bool
     enable_networking: bool
     cs: CameraServer
     cs_output: None
-    alliance: Alliance
+    alliance: Alliance = Alliance.BLUE
 
     def __init__(
         self, enable_calibration: bool = False, enable_networking: bool = True
@@ -227,18 +228,18 @@ class Driver:
         if self.alliance == Alliance.BLUE:
             data = frc_vision.astra.utils.zip_networktables_data(txb, tyb, tdb)
         else:
-            data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
+           data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
 
-        self.write_to_networktables(data)
+        if self.enable_networking:
+            self.write_to_networktables(data)
         return blue_circles, red_circles, data
 
     def send_data(self, frame, blue_circles, red_circles, start_time):
         """Sends frame data with annotations to the driver's station."""
-        if self.client:
-            frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
-            frame = frc_vision.viewer.draw_metrics(frame, start_time)
-            # frame = cv2.resize(frame, (320, 240))
-            self.cs_output.putFrame(frame)
+        frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
+        frame = frc_vision.viewer.draw_metrics(frame, start_time)
+        frame = cv2.resize(frame, (160, 120))
+        self.cs_output.putFrame(frame)
 
     def write_rpi_temps(self):
         """Runs `vcgencmd measure_temp` to get the current temperature of the Pi and sends it to SmartDashboard."""
@@ -255,7 +256,7 @@ class Driver:
         """
         self.alliance = (
             Alliance.RED
-            if self.tables.FMSInfo.getBoolean("isRedAlliance")
+            if self.tables.FMSInfo.getBoolean("IsRedAlliance", True)
             else Alliance.BLUE
         )
 
@@ -278,7 +279,8 @@ class Driver:
                 blue_circles, red_circles, data = self.process_frame(
                     color_frame, depth_frame
                 )
-
+                # print(time.time())
+                
                 tx, ty, ta = data
 
                 self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)
