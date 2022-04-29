@@ -4,6 +4,10 @@ OpenCV and OpenNI gamepiece detection code to be used on the 2022 robot.
 
 Features NetworkTables integration to send various datapoints to driver's station and robot.
 
+Won Innovation in Control Award at the FIRST Indiana District Kokomo Event.
+
+Won Autonomous Award at the FIRST Indiana District Tippecanoe Event.
+
 ## Contributing
 
 ### Dependencies
