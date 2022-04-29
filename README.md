@@ -1,4 +1,4 @@
-# open-cv-2022
+# vision-2022
 
 OpenCV and OpenNI gamepiece detection code to be used on the 2022 robot.
 
