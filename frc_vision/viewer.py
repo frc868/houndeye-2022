@@ -36,16 +36,13 @@ def draw_circles(
     """
     Draw circles on a given frame, along with distance information
 
-    Params:
+    Args:
         frame: the frame to draw circles on
         blue_circles: blue circles generated from `find_circles`
         red_circles: red circles generated from `find_circles`
 
     Returns:
         frame: the frame with circles drawn on it
-
-    Raises:
-        None
     """
 
     if blue_circles is not None:

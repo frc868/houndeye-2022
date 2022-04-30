@@ -76,16 +76,6 @@ class Driver:
         """
         Initializes and synchronized the color and depth streams from an
         Orbbec Astra camera through OpenNI.
-
-        Params:
-            None
-
-        Returns:
-            None
-
-        Raises:
-            None
-
         """
         logger.info("Initializing OpenNI")
         openni2.initialize(dll_directories=["./openni-redist"])
@@ -143,15 +133,12 @@ class Driver:
         Reads the color and depth frames from an Orbbec Astra camera
         through OpenNI and converts it to an openCV-usable format.
 
-        Params:
+        Args:
             None
 
         Returns:
             openCV color frame
             openCV depth frame
-
-        Raises:
-            None
         """
 
         raw_color_frame = self.color_stream.read_frame()
@@ -228,7 +215,7 @@ class Driver:
         if self.alliance == Alliance.BLUE:
             data = frc_vision.astra.utils.zip_networktables_data(txb, tyb, tdb)
         else:
-           data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
+            data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
 
         if self.enable_networking:
             self.write_to_networktables(data)
@@ -280,7 +267,7 @@ class Driver:
                     color_frame, depth_frame
                 )
                 # print(time.time())
-                
+
                 tx, ty, ta = data
 
                 self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)

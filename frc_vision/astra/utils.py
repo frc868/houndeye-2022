@@ -14,16 +14,13 @@ def generate_masks(
     Generates a blue and a red mask for a frame.
     (applies GaussianBlur at the start)
 
-    Params:
+    Args:
         frame: a raw frame from Astra
 
     Returns:
-        blue_mask
-        red_mask
-
-    Raises:
-        None
+        a blue mask and a red mask
     """
+
     frame = cv2.GaussianBlur(frame, (7, 7), sigmaX=1.5, sigmaY=1.5)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -52,15 +49,12 @@ def find_circles(mask: cv2Frame, depth_frame: cv2Frame) -> circles:
     """
     Finds circles given a blurred mask.
 
-    Params:
+    Args:
         mask: a BLURRED mask (typically GaussianBlur) to perform operations on
         depth_frame: a depth frame from the Astra
 
     Returns:
         circles: circles found in the frame
-
-    Raises:
-        None
     """
 
     cnts, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -93,7 +87,7 @@ def calculate_distance(x: int, y: int, r: int, depth_frame: cv2Frame) -> float:
     """
     Calculates the distance a certain circle is from the camera.
 
-    Params:
+    Args:
         x: the x coordinate of the circle in the frame (NOT tx)
         y: the y coordinate of the circle in the frame (NOT ty)
         r: the radius of the circle
@@ -101,10 +95,6 @@ def calculate_distance(x: int, y: int, r: int, depth_frame: cv2Frame) -> float:
 
     Returns:
         distance: the distance the ball is from the camera (needs calibration)
-
-    Raises:
-        None
-
     """
     raw_distance = depth_frame[int(y), int(x)]
     raw_distance = int(raw_distance)
@@ -121,15 +111,12 @@ def calculate_angles(circles: circles):
     """
     Calculates x and y deviation from center of camera feed.
 
-    Params:
+    Args:
         circles: circles returned from `find_circles`
 
     Returns:
         tx: the x degree offset from the center of the frame
         ty: the y degree offset from the center of the frame
-
-    Raises:
-        None
     """
     tx = []
     ty = []
