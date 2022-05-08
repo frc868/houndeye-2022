@@ -17,12 +17,12 @@ from networktables import NetworkTables
 from openni import _openni2 as c_api
 from openni import openni2
 
-import frc_vision.astra.utils
-import frc_vision.calibration
-import frc_vision.constants
-import frc_vision.utils
-import frc_vision.viewer
-from frc_vision.utils import circles, cv2Frame
+import houndeye.astra.utils
+import houndeye.calibration
+import houndeye.constants
+import houndeye.utils
+import houndeye.viewer
+from houndeye.utils import circles, cv2Frame
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class TableGroup:
-    FRCVision: networktables.NetworkTable
+    HoundEye: networktables.NetworkTable
     SmartDashboard: networktables.NetworkTable
     FMSInfo: networktables.NetworkTable
 
@@ -46,7 +46,7 @@ class Alliance(enum.IntEnum):
 
 
 class Driver:
-    """Main class that runs the Astra. Uses util functions from `frc_vision.astra.utils`."""
+    """Main class that runs the Astra. Uses util functions from `houndeye.astra.utils`."""
 
     color_stream: typing.Optional[openni2.VideoStream]
     depth_stream: typing.Optional[openni2.VideoStream]
@@ -91,9 +91,9 @@ class Driver:
         self.color_stream.set_video_mode(
             c_api.OniVideoMode(
                 pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888,
-                resolutionX=frc_vision.constants.ASTRA.RESOLUTION_W,
-                resolutionY=frc_vision.constants.ASTRA.RESOLUTION_H,
-                fps=frc_vision.constants.ASTRA.FPS,
+                resolutionX=houndeye.constants.ASTRA.RESOLUTION_W,
+                resolutionY=houndeye.constants.ASTRA.RESOLUTION_H,
+                fps=houndeye.constants.ASTRA.FPS,
             )
         )
         self.color_stream.start()
@@ -104,9 +104,9 @@ class Driver:
         self.depth_stream.set_video_mode(
             c_api.OniVideoMode(
                 pixelFormat=c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_100_UM,
-                resolutionX=frc_vision.constants.ASTRA.RESOLUTION_W,
-                resolutionY=frc_vision.constants.ASTRA.RESOLUTION_H,
-                fps=frc_vision.constants.ASTRA.FPS,
+                resolutionX=houndeye.constants.ASTRA.RESOLUTION_W,
+                resolutionY=houndeye.constants.ASTRA.RESOLUTION_H,
+                fps=houndeye.constants.ASTRA.FPS,
             )
         )
         self.depth_stream.start()
@@ -117,8 +117,8 @@ class Driver:
 
     def initialize_networktables(self):
         """Connects to NetworkTables on the roboRIO."""
-        NetworkTables.initialize(server=frc_vision.constants.SERVERS.ROBORIO_SERVER_IP)
-        self.tables.FRCVision = NetworkTables.getTable("FRCVision")
+        NetworkTables.initialize(server=houndeye.constants.SERVERS.ROBORIO_SERVER_IP)
+        self.tables.HoundEye = NetworkTables.getTable("HoundEye")
         self.tables.SmartDashboard = NetworkTables.getTable("SmartDashboard")
         self.tables.FMSInfo = NetworkTables.getTable("FMSInfo")
         self.set_alliance()
@@ -146,8 +146,8 @@ class Driver:
             raw_color_frame.get_buffer_as_uint8(), dtype=np.uint8
         )
         color_frame.shape = (
-            frc_vision.constants.ASTRA.RESOLUTION_H,
-            frc_vision.constants.ASTRA.RESOLUTION_W,
+            houndeye.constants.ASTRA.RESOLUTION_H,
+            houndeye.constants.ASTRA.RESOLUTION_W,
             3,
         )
         color_frame = cv2.cvtColor(color_frame, cv2.COLOR_BGR2RGB)
@@ -158,8 +158,8 @@ class Driver:
             raw_depth_frame.get_buffer_as_uint16(), dtype=np.uint16
         )
         depth_frame.shape = (
-            frc_vision.constants.ASTRA.RESOLUTION_H,
-            frc_vision.constants.ASTRA.RESOLUTION_W,
+            houndeye.constants.ASTRA.RESOLUTION_H,
+            houndeye.constants.ASTRA.RESOLUTION_W,
         )
         depth_frame = cv2.medianBlur(depth_frame, 3)
         depth_frame = cv2.flip(depth_frame, 1)
@@ -188,12 +188,12 @@ class Driver:
         td: distance from camera to ball
         """
         tx, ty, td = data
-        self.tables.FRCVision.putString(
+        self.tables.HoundEye.putString(
             "alliance", "B" if self.alliance == Alliance.BLUE else "R"
         )
-        self.tables.FRCVision.putNumberArray("tx", tx)
-        self.tables.FRCVision.putNumberArray("ty", ty)
-        self.tables.FRCVision.putNumberArray("td", td)
+        self.tables.HoundEye.putNumberArray("tx", tx)
+        self.tables.HoundEye.putNumberArray("ty", ty)
+        self.tables.HoundEye.putNumberArray("td", td)
 
     def process_frame(
         self, color_frame: cv2Frame, depth_frame: cv2Frame
@@ -202,20 +202,20 @@ class Driver:
         Run all processing on the frames and return
         the end result. (Not decided yet)
         """
-        blue_mask, red_mask = frc_vision.astra.utils.generate_masks(color_frame)
-        blue_circles = frc_vision.astra.utils.find_circles(blue_mask, depth_frame)
-        red_circles = frc_vision.astra.utils.find_circles(red_mask, depth_frame)
+        blue_mask, red_mask = houndeye.astra.utils.generate_masks(color_frame)
+        blue_circles = houndeye.astra.utils.find_circles(blue_mask, depth_frame)
+        red_circles = houndeye.astra.utils.find_circles(red_mask, depth_frame)
 
-        txb, tyb = frc_vision.astra.utils.calculate_angles(blue_circles)
-        txr, tyr = frc_vision.astra.utils.calculate_angles(red_circles)
+        txb, tyb = houndeye.astra.utils.calculate_angles(blue_circles)
+        txr, tyr = houndeye.astra.utils.calculate_angles(red_circles)
 
         tdb = [d for x, y, r, d in blue_circles]
         tdr = [d for x, y, r, d in red_circles]
 
         if self.alliance == Alliance.BLUE:
-            data = frc_vision.astra.utils.zip_networktables_data(txb, tyb, tdb)
+            data = houndeye.astra.utils.zip_networktables_data(txb, tyb, tdb)
         else:
-            data = frc_vision.astra.utils.zip_networktables_data(txr, tyr, tdr)
+            data = houndeye.astra.utils.zip_networktables_data(txr, tyr, tdr)
 
         if self.enable_networking:
             self.write_to_networktables(data)
@@ -223,8 +223,8 @@ class Driver:
 
     def send_data(self, frame, blue_circles, red_circles, start_time):
         """Sends frame data with annotations to the driver's station."""
-        frame = frc_vision.viewer.draw_circles(frame, blue_circles, red_circles)
-        frame = frc_vision.viewer.draw_metrics(frame, start_time)
+        frame = houndeye.viewer.draw_circles(frame, blue_circles, red_circles)
+        frame = houndeye.viewer.draw_metrics(frame, start_time)
         frame = cv2.resize(frame, (160, 120))
         self.cs_output.putFrame(frame)
 
@@ -249,10 +249,10 @@ class Driver:
 
     def run(self) -> None:
         """Main driver to run the detection program."""
-        frc_vision.constants.load_constants()
+        houndeye.constants.load_constants()
 
         if self.enable_calibration:
-            frc_vision.calibration.initalize_calibrators()
+            houndeye.calibration.initalize_calibrators()
 
         # if self.enable_networking:
         #     conn_thread = threading.Thread(target=self.wait_for_connection)
@@ -270,8 +270,8 @@ class Driver:
 
                 tx, ty, ta = data
 
-                self.camera_settings.set_exposure(frc_vision.constants.ASTRA.EXPOSURE)
-                self.camera_settings.set_gain(frc_vision.constants.ASTRA.GAIN)
+                self.camera_settings.set_exposure(houndeye.constants.ASTRA.EXPOSURE)
+                self.camera_settings.set_gain(houndeye.constants.ASTRA.GAIN)
 
                 if self.enable_networking:
                     self.send_data(color_frame, blue_circles, red_circles, start_time)
@@ -279,31 +279,31 @@ class Driver:
                     self.write_rpi_temps()
 
                 if self.enable_calibration:
-                    blue_mask, red_mask = frc_vision.astra.utils.generate_masks(
+                    blue_mask, red_mask = houndeye.astra.utils.generate_masks(
                         color_frame
                     )
 
-                    frc_vision.viewer.view(
+                    houndeye.viewer.view(
                         frames=(
-                            frc_vision.viewer.ViewerFrame(
+                            houndeye.viewer.ViewerFrame(
                                 color_frame, "color", show_data=True
                             ),
-                            frc_vision.viewer.ViewerFrame(depth_frame, "depth"),
-                            frc_vision.viewer.ViewerFrame(blue_mask, "blue"),
-                            frc_vision.viewer.ViewerFrame(red_mask, "red"),
+                            houndeye.viewer.ViewerFrame(depth_frame, "depth"),
+                            houndeye.viewer.ViewerFrame(blue_mask, "blue"),
+                            houndeye.viewer.ViewerFrame(red_mask, "red"),
                         ),
                         circles=(blue_circles, red_circles),
                         data=(
-                            frc_vision.viewer.ViewerData("tx", tx),
-                            frc_vision.viewer.ViewerData("ty", ty),
-                            frc_vision.viewer.ViewerData("ta", ta),
+                            houndeye.viewer.ViewerData("tx", tx),
+                            houndeye.viewer.ViewerData("ty", ty),
+                            houndeye.viewer.ViewerData("ta", ta),
                         ),
                         start_time=start_time,
                     )
 
-                    frc_vision.calibration.update_calibrators()
+                    houndeye.calibration.update_calibrators()
 
-                if cv2.waitKey(15) == frc_vision.constants.KEYS.CV2_WAIT_KEY:
+                if cv2.waitKey(15) == houndeye.constants.KEYS.CV2_WAIT_KEY:
                     running = False
             except KeyboardInterrupt:
                 running = False

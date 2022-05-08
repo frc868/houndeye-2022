@@ -2,9 +2,9 @@ import math
 
 import cv2
 
-import frc_vision.constants
-import frc_vision.utils
-from frc_vision.utils import circles, cv2Frame
+import houndeye.constants
+import houndeye.utils
+from houndeye.utils import circles, cv2Frame
 
 
 def generate_masks(
@@ -26,19 +26,19 @@ def generate_masks(
 
     blue_mask = cv2.inRange(
         hsv,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U,
+        houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L,
+        houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U,
     )
 
     red_mask1 = cv2.inRange(
         hsv,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U,
+        houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L,
+        houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U,
     )
     red_mask2 = cv2.inRange(
         hsv,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2,
-        frc_vision.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2,
+        houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2,
+        houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2,
     )
     red_mask = red_mask1 | red_mask2
 
@@ -70,7 +70,7 @@ def find_circles(mask: cv2Frame, depth_frame: cv2Frame) -> circles:
             r > 10,
             (
                 (circle_area / contour_area)
-                < frc_vision.constants.CIRCLE_COMPARISON_THRESHOLD
+                < houndeye.constants.CIRCLE_COMPARISON_THRESHOLD
             )
             if contour_area != 0
             else False,
@@ -122,14 +122,14 @@ def calculate_angles(circles: circles):
     ty = []
     for x, y, r, d in circles:
         tx += [
-            (frc_vision.constants.ASTRA.FOV_H / 2)
-            * (x - (frc_vision.constants.ASTRA.RESOLUTION_W / 2))
-            / (frc_vision.constants.ASTRA.RESOLUTION_W / 2)
+            (houndeye.constants.ASTRA.FOV_H / 2)
+            * (x - (houndeye.constants.ASTRA.RESOLUTION_W / 2))
+            / (houndeye.constants.ASTRA.RESOLUTION_W / 2)
         ]
         ty += [
-            (frc_vision.constants.ASTRA.FOV_V / 2)
-            * (y - (frc_vision.constants.ASTRA.RESOLUTION_H / 2))
-            / (frc_vision.constants.ASTRA.RESOLUTION_H / 2)
+            (houndeye.constants.ASTRA.FOV_V / 2)
+            * (y - (houndeye.constants.ASTRA.RESOLUTION_H / 2))
+            / (houndeye.constants.ASTRA.RESOLUTION_H / 2)
         ]
     return tx, ty
 

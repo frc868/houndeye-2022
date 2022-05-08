@@ -1,7 +1,7 @@
 import argparse
 import traceback
 
-import frc_vision.astra.driver
+import houndeye.astra.driver
 
 parser = argparse.ArgumentParser(description="Run main driver program (on pi).")
 parser.add_argument("--enable-calibration", action="store_true", dest="calibration")
@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 
 def main():
-    d = frc_vision.astra.driver.Driver(
+    d = houndeye.astra.driver.Driver(
         enable_calibration=args.calibration, enable_networking=args.networking
     )
     d.run()

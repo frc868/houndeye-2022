@@ -4,17 +4,17 @@ import typing
 import cv2
 import numpy as np
 
-import frc_vision.astra.utils
-import frc_vision.utils
+import houndeye.astra.utils
+import houndeye.utils
 
 
 class ViewerFrame:
-    frame: frc_vision.utils.cv2Frame
+    frame: houndeye.utils.cv2Frame
     name: str
     show_data: bool
 
     def __init__(
-        self, frame: frc_vision.utils.cv2Frame, name: str, show_data: bool = False
+        self, frame: houndeye.utils.cv2Frame, name: str, show_data: bool = False
     ):
         self.frame = frame
         self.name = name
@@ -31,8 +31,8 @@ class ViewerData:
 
 
 def draw_circles(
-    frame: frc_vision.utils.cv2Frame, blue_circles, red_circles
-) -> frc_vision.utils.cv2Frame:
+    frame: houndeye.utils.cv2Frame, blue_circles, red_circles
+) -> houndeye.utils.cv2Frame:
     """
     Draw circles on a given frame, along with distance information
 
@@ -71,7 +71,7 @@ def calculate_fps(start_time: float) -> float:
 
 def draw_metrics(
     frame, start_time: float, data: tuple[ViewerData] = ()
-) -> frc_vision.utils.cv2Frame:
+) -> houndeye.utils.cv2Frame:
     """Draws metrics to the frame. Also draws FPS."""
     data = (ViewerData("FPS", calculate_fps(start_time)),) + data
     for idx, d in enumerate(data):
