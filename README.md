@@ -1,4 +1,4 @@
-# vision-2022
+# `houndeye`
 
 OpenCV and OpenNI gamepiece detection code to be used on the 2022 robot.
 
