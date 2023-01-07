@@ -27,7 +27,7 @@ In order to use this project with an Astra camera, you must have Orbbec's flavor
 
 ### Constants and Config
 
-Do not commit changes to the `constants.py` file. These values have been calibrated for individual cameras and game pieces and need not be changed. You may, however, edit the `config.py` file (on your local machine, again do not commit this) to change the project's function (i.e. switching to your computer's webcam instead of using the Astra, disabling NetworkTables when not connected to a robot/testbench, or enabling a video feed).
+Do not commit changes to the `constants.json` file. These values have been calibrated for individual cameras and game pieces and need not be changed. You may, however, change the command-line args that you use to change the project's function (i.e. switching to your computer's webcam instead of using the Astra, disabling NetworkTables when not connected to a robot/testbench, or enabling a video feed).
 
 ### Code Quality and Standards
 
