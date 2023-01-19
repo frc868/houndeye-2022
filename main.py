@@ -1,9 +1,10 @@
 import argparse
 import traceback
 
-import houndeye.astra.driver
+import houndeye.drivers
+import houndeye.runner
 
-parser = argparse.ArgumentParser(description="Run main driver program (on pi).")
+parser = argparse.ArgumentParser(description="Run HoundEye.")
 parser.add_argument("--enable-calibration", action="store_true", dest="calibration")
 parser.add_argument("--disable-networking", action="store_false", dest="networking")
 
@@ -11,10 +12,10 @@ args = parser.parse_args()
 
 
 def main():
-    d = houndeye.astra.driver.Driver(
-        enable_calibration=args.calibration, enable_networking=args.networking
+    runner = houndeye.runner.Runner(
+        [houndeye.drivers.j5Create()], args.enable_calibration, args.enable_networking
     )
-    d.run()
+    runner.run()
 
 
 if __name__ == "__main__":

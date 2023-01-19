@@ -2,4 +2,4 @@ pynetworktables
 opencv-python
 openni
 robotpy-cscore
-tkinter
+tk

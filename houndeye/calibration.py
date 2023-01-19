@@ -1,6 +1,6 @@
 import tkinter as tk
 
-import houndeye.astra.driver
+import houndeye.drivers.astra
 import houndeye.constants
 
 """
@@ -45,37 +45,37 @@ def initalize_calibrators():
     root = tk.Tk()
 
     create_label("HSV Lower Bound (B)")
-    create_scale(0, 179, "HLB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[0])
-    create_scale(0, 255, "SLB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[1])
-    create_scale(0, 255, "VLB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[2])
+    create_scale(0, 179, "HLB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[0])
+    create_scale(0, 255, "SLB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[1])
+    create_scale(0, 255, "VLB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[2])
     
     create_label("HSV Upper Bound (B)")
-    create_scale(0, 179, "HUB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[0])
-    create_scale(0, 255, "SUB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[1])
-    create_scale(0, 255, "VUB", houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[2])
+    create_scale(0, 179, "HUB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[0])
+    create_scale(0, 255, "SUB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[1])
+    create_scale(0, 255, "VUB", houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[2])
     
     create_label("HSV Lower Bound (R)")
-    create_scale(0, 179, "HLR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[0])
-    create_scale(0, 255, "SLR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[1])
-    create_scale(0, 255, "VLR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[2])
+    create_scale(0, 179, "HLR", houndeye.constants.Astra.HsvBounds.RED_BOUND_L[0])
+    create_scale(0, 255, "SLR", houndeye.constants.Astra.HsvBounds.RED_BOUND_L[1])
+    create_scale(0, 255, "VLR", houndeye.constants.Astra.HsvBounds.RED_BOUND_L[2])
     
     create_label("HSV Upper Bound (R)")
-    create_scale(0, 179, "HUR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[0])
-    create_scale(0, 255, "SUR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[1])
-    create_scale(0, 255, "VUR", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[2])
+    create_scale(0, 179, "HUR", houndeye.constants.Astra.HsvBounds.RED_BOUND_U[0])
+    create_scale(0, 255, "SUR", houndeye.constants.Astra.HsvBounds.RED_BOUND_U[1])
+    create_scale(0, 255, "VUR", houndeye.constants.Astra.HsvBounds.RED_BOUND_U[2])
 
     create_label("HSV Bound (R2)")
-    create_scale(0, 179, "HLR2", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2[0])    
-    create_scale(0, 179, "HUR2", houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[0])
+    create_scale(0, 179, "HLR2", houndeye.constants.Astra.HsvBounds.RED_BOUND_L2[0])    
+    create_scale(0, 179, "HUR2", houndeye.constants.Astra.HsvBounds.RED_BOUND_U2[0])
 
     create_label("Circle Comparison Threshold")
     create_scale(50, 300, "circle", int(houndeye.constants.CIRCLE_COMPARISON_THRESHOLD*100))
         
     create_label("Exposure")
-    create_scale(0, 500, "exp", houndeye.constants.ASTRA.EXPOSURE)
+    create_scale(0, 500, "exp", houndeye.constants.Astra.EXPOSURE)
 
     create_label("Gain")
-    create_scale(0, 500, "gain", houndeye.constants.ASTRA.GAIN)
+    create_scale(0, 500, "gain", houndeye.constants.Astra.GAIN)
 
     save_b = tk.Button(root, text="Save constants to file", command=houndeye.constants.dump_constants)
     save_b.pack()
@@ -97,7 +97,7 @@ def initalize_calibrators():
     color_b.pack()
 
     def center_b_callback():
-        houndeye.astra.driver
+        houndeye.drivers.astra
 
     center_b = tk.Button(root, text="Center values", command=center_b_callback)
     center_b.pack()
@@ -119,24 +119,24 @@ def calibrators(key: str, value: str):
     """
     Set constants to trackbar positions.
     """
-    if key == "HLB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[0] = int(value)
-    if key == "SLB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[1] = int(value)
-    if key == "VLB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_L[2] = int(value)
-    if key == "HUB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[0] = int(value)
-    if key == "SUB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[1] = int(value)
-    if key == "VUB": houndeye.constants.ASTRA.HSV_BOUNDS.BLUE_BOUND_U[2] = int(value)
-    if key == "HLR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[0] = int(value)
-    if key == "SLR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[1] = houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2[1] = int(value)
-    if key == "VLR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L[2] = houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2[2] = int(value)
-    if key == "HUR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[0] = int(value)
-    if key == "SUR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[1] = houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[1] = int(value)
-    if key == "VUR": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U[2] = houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[2] = int(value)
-    if key == "HLR2": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_L2[0] = int(value)
-    if key == "HUR2": houndeye.constants.ASTRA.HSV_BOUNDS.RED_BOUND_U2[0] = int(value)
+    if key == "HLB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[0] = int(value)
+    if key == "SLB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[1] = int(value)
+    if key == "VLB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_L[2] = int(value)
+    if key == "HUB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[0] = int(value)
+    if key == "SUB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[1] = int(value)
+    if key == "VUB": houndeye.constants.Astra.HsvBounds.BLUE_BOUND_U[2] = int(value)
+    if key == "HLR": houndeye.constants.Astra.HsvBounds.RED_BOUND_L[0] = int(value)
+    if key == "SLR": houndeye.constants.Astra.HsvBounds.RED_BOUND_L[1] = houndeye.constants.Astra.HsvBounds.RED_BOUND_L2[1] = int(value)
+    if key == "VLR": houndeye.constants.Astra.HsvBounds.RED_BOUND_L[2] = houndeye.constants.Astra.HsvBounds.RED_BOUND_L2[2] = int(value)
+    if key == "HUR": houndeye.constants.Astra.HsvBounds.RED_BOUND_U[0] = int(value)
+    if key == "SUR": houndeye.constants.Astra.HsvBounds.RED_BOUND_U[1] = houndeye.constants.Astra.HsvBounds.RED_BOUND_U2[1] = int(value)
+    if key == "VUR": houndeye.constants.Astra.HsvBounds.RED_BOUND_U[2] = houndeye.constants.Astra.HsvBounds.RED_BOUND_U2[2] = int(value)
+    if key == "HLR2": houndeye.constants.Astra.HsvBounds.RED_BOUND_L2[0] = int(value)
+    if key == "HUR2": houndeye.constants.Astra.HsvBounds.RED_BOUND_U2[0] = int(value)
 
     if key == "circle": houndeye.constants.CIRCLE_COMPARISON_THRESHOLD = int(value)/100
-    if key == "exp": houndeye.constants.ASTRA.EXPOSURE = int(value)
-    if key == "gain": houndeye.constants.ASTRA.GAIN = int(value)
+    if key == "exp": houndeye.constants.Astra.EXPOSURE = int(value)
+    if key == "gain": houndeye.constants.Astra.GAIN = int(value)
 
 
 
